@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreelanceIQ — AI Scope & Pricing Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #070D1A;
+  --surface: #0F1829;
+  --card: #111E30;
+  --card2: #182338;
+  --border: #1E2F48;
+  --border2: #2A3F5F;
+  --cyan: #00D4FF;
+  --cyan-dim: rgba(0,212,255,0.12);
+  --purple: #7C3AED;
+  --purple-bright: #A78BFA;
+  --green: #10B981;
+  --green-dim: rgba(16,185,129,0.12);
+  --yellow: #F59E0B;
+  --yellow-dim: rgba(245,158,11,0.12);
+  --red: #EF4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --text: #E2E8F0;
+  --muted: #64748B;
+  --muted2: #94A3B8;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky; top: 0;
+  background: rgba(7,13,26,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.logo span { color: var(--cyan); }
+.header-badge {
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,212,255,0.25);
+  color: var(--cyan);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  padding: 5rem 2rem 3rem;
+  text-align: center;
+  z-index: 1;
+}
+.hero-glow {
+  position: absolute;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,212,255,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, var(--cyan), var(--purple-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 1.1rem;
+  color: var(--muted2);
+  max-width: 560px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+.hero-stat {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted2);
+}
+.hero-stat .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+/* ── PROGRESS STEPS ── */
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto 2.5rem;
+  max-width: 700px;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  position: relative;
+}
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 16px; left: 50%;
+  width: 100%; height: 2px;
+  background: var(--border2);
+  z-index: -1;
+  transition: background 0.4s;
+}
+.step-item.done:not(:last-child)::after { background: var(--cyan); }
+.step-bubble {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1;
+}
+.step-item.active .step-bubble {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: #000;
+  box-shadow: 0 0 20px rgba(0,212,255,0.4);
+}
+.step-item.done .step-bubble {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.step-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.step-item.active .step-label { color: var(--cyan); }
+.step-item.done .step-label { color: var(--green); }
+
+/* ── MAIN CONTAINER ── */
+.main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1rem;
+}
+.card-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-header h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-header p { font-size: 0.85rem; color: var(--muted2); margin-top: 4px; }
+.step-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.step-icon.cyan { background: var(--cyan-dim); }
+.step-icon.purple { background: rgba(124,58,237,0.15); }
+.step-icon.green { background: var(--green-dim); }
+.step-icon.yellow { background: var(--yellow-dim); }
+
+/* ── FORM ELEMENTS ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-grid.full { grid-template-columns: 1fr; }
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field input, .field select, .field textarea {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: var(--font);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+}
+.field select option { background: var(--card); }
+.field input.input-error, .field textarea.input-error {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15) !important;
+}
+.field-error {
+  color: var(--red);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 4px;
+  padding: 6px 10px;
+  background: var(--red-dim);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 6px;
+  animation: fadeSlide 0.2s ease;
+}
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.field input[type="range"] {
+  padding: 0;
+  cursor: pointer;
+  accent-color: var(--cyan);
+  border: none;
+  background: transparent;
+  height: 24px;
+}
+
+/* Skill level cards */
+.skill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+@media (max-width: 600px) { .skill-grid { grid-template-columns: 1fr 1fr; } }
+.skill-card {
+  border: 2px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 1rem 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface);
+}
+.skill-card:hover { border-color: var(--cyan); background: var(--cyan-dim); }
+.skill-card.selected {
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+  box-shadow: 0 0 16px rgba(0,212,255,0.2);
+}
+.skill-card .sk-emoji { font-size: 1.6rem; margin-bottom: 4px; }
+.skill-card .sk-title { font-size: 0.8rem; font-weight: 700; }
+.skill-card .sk-years { font-size: 0.68rem; color: var(--muted2); margin-top: 2px; }
+.skill-card .sk-rate { font-size: 0.72rem; color: var(--cyan); margin-top: 4px; font-weight: 600; }
+
+/* Deliverables */
+.deliverable-list { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.75rem; }
+.deliverable-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+}
+.deliverable-row input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  min-width: 0;
+  font-family: var(--font);
+}
+.deliverable-row select {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.78rem;
+  padding: 4px 6px;
+  outline: none;
+  font-family: var(--font);
+}
+.deliverable-row select.simple { color: var(--green); border-color: rgba(16,185,129,0.3); background: var(--green-dim); }
+.deliverable-row select.medium { color: var(--yellow); border-color: rgba(245,158,11,0.3); background: var(--yellow-dim); }
+.deliverable-row select.complex { color: var(--red); border-color: rgba(239,68,68,0.3); background: var(--red-dim); }
+.del-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+.del-remove:hover { color: var(--red); }
+.del-qty {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.78rem; color: var(--muted2);
+}
+.del-qty input {
+  width: 38px;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text);
+  text-align: center;
+  padding: 4px;
+  font-size: 0.8rem;
+  font-family: var(--font);
+}
+.add-del-btn {
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--cyan);
+  font-size: 0.85rem;
+  padding: 0.6rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.add-del-btn:hover { background: var(--cyan-dim); border-color: var(--cyan); }
+
+/* Suggestion chips */
+.suggestions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.chip {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  cursor: pointer;
+  color: var(--muted2);
+  background: var(--surface);
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.chip:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+
+/* Risk factors */
+.risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 600px) { .risk-grid { grid-template-columns: 1fr; } }
+.risk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface);
+  user-select: none;
+}
+.risk-item:hover { border-color: var(--yellow); background: var(--yellow-dim); }
+.risk-item.checked { border-color: var(--yellow); background: var(--yellow-dim); }
+.risk-check {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border2);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.risk-item.checked .risk-check { background: var(--yellow); border-color: var(--yellow); color: #000; font-size: 0.7rem; }
+.risk-info .ri-label { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+.risk-info .ri-pct { font-size: 0.72rem; color: var(--yellow); margin-top: 2px; }
+
+/* Urgency selector */
+.urgency-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+@media (max-width: 600px) { .urgency-grid { grid-template-columns: 1fr 1fr; } }
+.urgency-card {
+  border: 2px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface);
+}
+.urgency-card:hover { border-color: var(--cyan); }
+.urgency-card.selected { border-color: var(--cyan); background: var(--cyan-dim); }
+.urg-emoji { font-size: 1.3rem; margin-bottom: 4px; }
+.urg-label { font-size: 0.75rem; font-weight: 700; }
+.urg-mult { font-size: 0.68rem; color: var(--muted2); margin-top: 2px; }
+
+/* Hours display */
+.hours-display {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+.hours-display .hd-label { font-size: 0.8rem; color: var(--muted2); }
+.hours-display .hd-val { font-size: 1.4rem; font-weight: 800; color: var(--cyan); }
+.hours-display .hd-weeks { font-size: 0.75rem; color: var(--muted2); }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; gap: 1rem; }
+.btn {
+  padding: 0.7rem 1.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--cyan), #0099BB);
+  color: #000;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,212,255,0.3); }
+.btn-secondary {
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+}
+.btn-secondary:hover { color: var(--text); border-color: var(--muted); }
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+}
+.btn-cta {
+  background: linear-gradient(135deg, #7C3AED, #A855F7);
+  color: #fff;
+}
+.btn-cta:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.3); }
+.btn-green {
+  background: linear-gradient(135deg, var(--green), #059669);
+  color: #fff;
+}
+
+/* ── AI THINKING ── */
+#aiThinking {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: none;
+}
+.ai-brain {
+  font-size: 3rem;
+  animation: pulse 1.5s infinite;
+  margin-bottom: 1rem;
+}
+@keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } }
+.ai-label { font-size: 1.1rem; font-weight: 700; color: var(--cyan); margin-bottom: 0.5rem; }
+.ai-sub { font-size: 0.85rem; color: var(--muted2); }
+.ai-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1.5rem; }
+.ai-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cyan); animation: dotPulse 1.2s infinite; }
+.ai-dot:nth-child(2) { animation-delay: 0.2s; background: var(--purple-bright); }
+.ai-dot:nth-child(3) { animation-delay: 0.4s; background: var(--green); }
+@keyframes dotPulse { 0%,100% { transform: scale(0.6); opacity: 0.4; } 50% { transform: scale(1); opacity: 1; } }
+.ai-steps { text-align: left; max-width: 340px; margin: 1.5rem auto 0; }
+.ai-step-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.8rem; color: var(--muted); margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+}
+.ai-step-item.done { color: var(--green); }
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ── RESULTS ── */
+#results { display: none; }
+.results-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.results-header h2 {
+  font-size: 1.8rem; font-weight: 900; letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+}
+.results-header p { color: var(--muted2); font-size: 0.9rem; }
+
+/* Price tiers */
+.price-tiers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+@media (max-width: 600px) { .price-tiers { grid-template-columns: 1fr; } }
+.price-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.price-card:hover { transform: translateY(-3px); }
+.price-card.recommended {
+  border-color: var(--cyan);
+  box-shadow: 0 0 30px rgba(0,212,255,0.15);
+}
+.price-card .tier-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 0.5rem; }
+.price-card .tier-price {
+  font-size: 2.2rem; font-weight: 900;
+  letter-spacing: -2px;
+  margin-bottom: 0.25rem;
+}
+.price-card.budget .tier-price { color: var(--text); }
+.price-card.standard .tier-price { color: var(--cyan); }
+.price-card.premium .tier-price { color: var(--purple-bright); }
+.price-card .tier-hourly { font-size: 0.78rem; color: var(--muted2); margin-bottom: 0.75rem; }
+.price-card .tier-desc { font-size: 0.78rem; color: var(--muted2); line-height: 1.5; }
+.recommended-badge {
+  position: absolute; top: 10px; right: -20px;
+  background: var(--cyan);
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 28px;
+  transform: rotate(35deg);
+  transform-origin: right top;
+}
+
+/* Hourly rate display */
+.rate-display {
+  background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08));
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.rate-item { text-align: center; }
+.rate-item .ri-val { font-size: 1.5rem; font-weight: 800; color: var(--cyan); }
+.rate-item .ri-label { font-size: 0.72rem; color: var(--muted2); margin-top: 2px; }
+
+/* Scope breakdown table */
+.scope-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.scope-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.scope-table td {
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+.scope-table tr:last-child td { border-bottom: none; }
+.scope-table tr:hover td { background: var(--card2); }
+.scope-table .td-name { font-weight: 600; }
+.scope-table .td-cost { font-weight: 700; color: var(--cyan); text-align: right; }
+.scope-table .td-hours { color: var(--muted2); text-align: right; }
+.scope-table .td-complexity { text-align: center; }
+.complexity-badge {
+  font-size: 0.68rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  text-transform: uppercase;
+}
+.complexity-badge.simple { background: var(--green-dim); color: var(--green); }
+.complexity-badge.medium { background: var(--yellow-dim); color: var(--yellow); }
+.complexity-badge.complex { background: var(--red-dim); color: var(--red); }
+.scope-total td { font-weight: 800; background: var(--card2); }
+.scope-total .td-cost { color: var(--cyan); font-size: 1rem; }
+
+/* Risk breakdown */
+.risk-summary { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+.risk-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.risk-row .rr-label { font-size: 0.82rem; display: flex; align-items: center; gap: 8px; }
+.risk-row .rr-bar-wrap { flex: 1; margin: 0 1rem; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.risk-row .rr-bar { height: 100%; border-radius: 3px; background: var(--yellow); transition: width 0.8s ease; }
+.risk-row .rr-pct { font-size: 0.78rem; font-weight: 700; color: var(--yellow); width: 35px; text-align: right; }
+
+/* Market position */
+.market-gauge {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.gauge-track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
+  margin: 1rem 0 0.5rem;
+}
+.gauge-needle {
+  position: absolute;
+  top: -6px;
+  width: 24px; height: 24px;
+  background: #fff;
+  border: 3px solid var(--cyan);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: left 1s ease;
+  box-shadow: 0 0 12px rgba(0,212,255,0.5);
+}
+.gauge-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.7rem; color: var(--muted);
+}
+.market-insight { font-size: 0.85rem; color: var(--muted2); margin-top: 0.75rem; line-height: 1.6; }
+.market-insight strong { color: var(--cyan); }
+
+/* Contract clauses */
+.clause-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+.clause-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.clause-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.clause-header:hover { background: var(--card2); }
+.clause-header-left { display: flex; align-items: center; gap: 10px; }
+.clause-tag {
+  font-size: 0.65rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.clause-tag.essential { background: rgba(16,185,129,0.15); color: var(--green); }
+.clause-tag.recommended { background: rgba(0,212,255,0.12); color: var(--cyan); }
+.clause-tag.protection { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.clause-title { font-size: 0.88rem; font-weight: 600; }
+.clause-toggle { color: var(--muted); font-size: 0.8rem; transition: transform 0.2s; }
+.clause-item.open .clause-toggle { transform: rotate(180deg); }
+.clause-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.clause-item.open .clause-body { max-height: 300px; }
+.clause-text {
+  padding: 0 1rem 1rem;
+  font-size: 0.82rem;
+  color: var(--muted2);
+  line-height: 1.7;
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+.copy-clause {
+  font-size: 0.72rem;
+  background: var(--card2);
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: var(--font);
+  transition: all 0.2s;
+}
+.copy-clause:hover { color: var(--cyan); border-color: var(--cyan); }
+
+/* Charts */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+@media (max-width: 620px) { .charts-row { grid-template-columns: 1fr; } }
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.chart-card h3 { font-size: 0.85rem; font-weight: 700; color: var(--muted2); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.chart-wrap { position: relative; height: 200px; }
+
+/* Action buttons */
+.action-row {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Quote box */
+#quoteBox {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  white-space: pre-wrap;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  font-family: 'Courier New', monospace;
+  color: var(--muted2);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Confidence score */
+.confidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-dim);
+  border: 1px solid rgba(16,185,129,0.25);
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+/* Utility */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+.divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+.text-cyan { color: var(--cyan); }
+.text-muted { color: var(--muted2); font-size: 0.82rem; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.hidden { display: none !important; }
+.fade-in { animation: fadeSlide 0.4s ease; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--green);
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    Freelance<span>IQ</span>
+  </div>
+  <div class="header-badge">AI-POWERED · BETA</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <h1>Price your work with<br><span class="gradient-text">AI-powered confidence</span></h1>
+  <p>Stop leaving money on the table. Get fair pricing ranges, scope breakdowns, risk buffers, and contract clauses — all in 90 seconds.</p>
+  <div class="hero-stats">
+    <span class="hero-stat"><span class="dot"></span> 47,000+ freelancers analyzed</span>
+    <span class="hero-stat"><span class="dot"></span> 12 market regions</span>
+    <span class="hero-stat"><span class="dot"></span> Real economic benchmarks</span>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="wizard-progress" id="wizardProgress">
+  <div class="step-item active" id="si1">
+    <div class="step-bubble">1</div>
+    <div class="step-label">Project</div>
+  </div>
+  <div class="step-item" id="si2">
+    <div class="step-bubble">2</div>
+    <div class="step-label">Deliverables</div>
+  </div>
+  <div class="step-item" id="si3">
+    <div class="step-bubble">3</div>
+    <div class="step-label">Expertise</div>
+  </div>
+  <div class="step-item" id="si4">
+    <div class="step-bubble">4</div>
+    <div class="step-label">Risk</div>
+  </div>
+  <div class="step-item" id="si5">
+    <div class="step-bubble">5</div>
+    <div class="step-label">Results</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══ STEP 1: PROJECT ══ -->
+  <div id="step1" class="fade-in">
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon cyan">🚀</div> Project Overview</h2>
+        <p>Tell us about the project. The more context, the smarter the estimate.</p>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Project Name</label>
+          <input type="text" id="projectName" placeholder="e.g. E-commerce Redesign for Acme Co." oninput="clearError('projectName', 'nameError')">
+          <div class="field-error" id="nameError" style="display:none">⚠️ Project name is required before continuing.</div>
+        </div>
+        <div class="field">
+          <label>Client Type</label>
+          <select id="clientType">
+            <option value="new">New Client (no prior relationship)</option>
+            <option value="returning">Returning Client (trusted)</option>
+            <option value="agency">Agency Referral</option>
+            <option value="enterprise">Enterprise / Large Company</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid mt-2">
+        <div class="field">
+          <label>Project Type</label>
+          <select id="projectType" onchange="updateSuggestions()">
+            <option value="web-design">🎨 Web Design / UI</option>
+            <option value="web-development">💻 Web Development</option>
+            <option value="mobile-app">📱 Mobile App</option>
+            <option value="branding">✏️ Branding & Identity</option>
+            <option value="content-writing">📝 Content Writing / Copywriting</option>
+            <option value="social-media">📣 Social Media Management</option>
+            <option value="data-analysis">📊 Data Analysis / BI</option>
+            <option value="ml-ai">🤖 Machine Learning / AI</option>
+            <option value="consulting">💡 Consulting / Strategy</option>
+            <option value="video-production">🎬 Video Production</option>
+            <option value="other">⚙️ Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Market Region</label>
+          <select id="region">
+            <option value="us-tier1">🇺🇸 USA – Major Cities (NYC, SF, Seattle)</option>
+            <option value="us-tier2" selected>🇺🇸 USA – General</option>
+            <option value="canada">🇨🇦 Canada</option>
+            <option value="uk">🇬🇧 United Kingdom</option>
+            <option value="western-europe">🇪🇺 Western Europe</option>
+            <option value="australia">🇦🇺 Australia / New Zealand</option>
+            <option value="eastern-europe">🌍 Eastern Europe</option>
+            <option value="asia-pacific">🌏 Asia Pacific</option>
+            <option value="latin-america">🌎 Latin America</option>
+            <option value="middle-east">🌐 Middle East / Africa</option>
+          </select>
+        </div>
+      </div>
+      <div class="field mt-2">
+        <label>Brief Description <span class="text-muted">(optional but helps)</span></label>
+        <textarea id="projectDesc" placeholder="e.g. Full redesign of a 10-page SaaS website, including a new design system, responsive layouts, and Webflow build..."></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="validateAndNext(1)">Next: Deliverables →</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2: DELIVERABLES ══ -->
+  <div id="step2" class="hidden">
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon purple">📦</div> Deliverables & Scope</h2>
+        <p>Add everything you'll deliver. Be specific — vague scope = scope creep.</p>
+      </div>
+      <div class="field-error" id="delError" style="display:none">⚠️ Please add at least one deliverable and make sure each one has a name.</div>
+      <span class="section-label">Quick add from common deliverables:</span>
+      <div class="suggestions" id="suggestionChips"></div>
+      <div class="deliverable-list" id="deliverableList"></div>
+      <button class="add-del-btn" onclick="addDeliverable()">+ Add Deliverable</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="validateAndNext(2)">Next: Expertise →</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3: EXPERTISE ══ -->
+  <div id="step3" class="hidden">
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon green">🧠</div> Your Expertise & Timeline</h2>
+        <p>Your skill level and urgency directly drive your market rate.</p>
+      </div>
+      <span class="section-label">Your Skill Level</span>
+      <div class="skill-grid" id="skillGrid">
+        <div class="skill-card" onclick="selectSkill('beginner', this)">
+          <div class="sk-emoji">🌱</div>
+          <div class="sk-title">Beginner</div>
+          <div class="sk-years">0–2 years</div>
+          <div class="sk-rate">$20–$40/hr</div>
+        </div>
+        <div class="skill-card" onclick="selectSkill('intermediate', this)">
+          <div class="sk-emoji">⚡</div>
+          <div class="sk-title">Intermediate</div>
+          <div class="sk-years">2–5 years</div>
+          <div class="sk-rate">$40–$80/hr</div>
+        </div>
+        <div class="skill-card selected" onclick="selectSkill('advanced', this)">
+          <div class="sk-emoji">🔥</div>
+          <div class="sk-title">Advanced</div>
+          <div class="sk-years">5–10 years</div>
+          <div class="sk-rate">$80–$130/hr</div>
+        </div>
+        <div class="skill-card" onclick="selectSkill('expert', this)">
+          <div class="sk-emoji">💎</div>
+          <div class="sk-title">Expert</div>
+          <div class="sk-years">10+ years</div>
+          <div class="sk-rate">$130–$250/hr</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <label>Estimated Hours <span class="text-muted">(total project)</span></label>
+        <input type="range" id="hoursSlider" min="5" max="500" value="40" oninput="updateHoursDisplay()">
+        <div class="hours-display">
+          <div>
+            <div class="hd-label">Total Hours</div>
+            <div class="hd-val" id="hoursVal">40 hrs</div>
+          </div>
+          <div>
+            <div class="hd-label">At 40h/wk</div>
+            <div class="hd-weeks" id="hoursWeeks">≈ 1 week</div>
+          </div>
+          <div>
+            <div class="hd-label">At 20h/wk</div>
+            <div id="hoursBiWeeks" class="hd-weeks">≈ 2 weeks</div>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <span class="section-label">Deadline Urgency</span>
+      <div class="urgency-grid">
+        <div class="urgency-card selected" onclick="selectUrgency('flexible', this)">
+          <div class="urg-emoji">🏖️</div>
+          <div class="urg-label">Flexible</div>
+          <div class="urg-mult">No rush</div>
+        </div>
+        <div class="urgency-card" onclick="selectUrgency('normal', this)">
+          <div class="urg-emoji">📅</div>
+          <div class="urg-label">Normal</div>
+          <div class="urg-mult">+10% buffer</div>
+        </div>
+        <div class="urgency-card" onclick="selectUrgency('tight', this)">
+          <div class="urg-emoji">⏰</div>
+          <div class="urg-label">Tight</div>
+          <div class="urg-mult">+25% rush</div>
+        </div>
+        <div class="urgency-card" onclick="selectUrgency('rush', this)">
+          <div class="urg-emoji">🚨</div>
+          <div class="urg-label">Rush</div>
+          <div class="urg-mult">+50% premium</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goToStep(4)">Next: Risk →</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 4: RISK ══ -->
+  <div id="step4" class="hidden">
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon yellow">⚠️</div> Risk Assessment</h2>
+        <p>Check any risk factors that apply. Each one adds a buffer to protect your margins.</p>
+      </div>
+      <div class="risk-grid" id="riskGrid">
+        <div class="risk-item" onclick="toggleRisk('new-client', this)" data-risk="new-client">
+          <div class="risk-check">✓</div>
+          <div class="risk-info">
+            <div class="ri-label">New client, no prior relationship</div>
+            <div class="ri-pct">+15% buffer</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('vague-req', this)" data-risk="vague-req">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Vague or unclear requirements</div>
+            <div class="ri-pct">+20% buffer</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('specialized', this)" data-risk="specialized">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Requires specialized skills or tools</div>
+            <div class="ri-pct">+12% premium</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('scope-creep', this)" data-risk="scope-creep">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Client has history of scope changes</div>
+            <div class="ri-pct">+25% buffer</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('intl-payment', this)" data-risk="intl-payment">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">International payment or tax complexity</div>
+            <div class="ri-pct">+8% admin</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('ip-complex', this)" data-risk="ip-complex">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Complex IP / ownership requirements</div>
+            <div class="ri-pct">+10% legal</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('multiple-reviewers', this)" data-risk="multiple-reviewers">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Multiple stakeholders / decision-makers</div>
+            <div class="ri-pct">+15% revision cycles</div>
+          </div>
+        </div>
+        <div class="risk-item" onclick="toggleRisk('no-contract', this)" data-risk="no-contract">
+          <div class="risk-check"></div>
+          <div class="risk-info">
+            <div class="ri-label">Client resistant to formal contract</div>
+            <div class="ri-pct">+30% risk premium</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+      <button class="btn btn-cta" onclick="runAnalysis()">⚡ Generate AI Analysis</button>
+    </div>
+  </div>
+
+  <!-- ══ AI THINKING ══ -->
+  <div id="aiThinking">
+    <div class="ai-brain">🧠</div>
+    <div class="ai-label">FreelanceIQ is analyzing your project...</div>
+    <div class="ai-sub">Running pricing models against 47,000+ freelance contracts</div>
+    <div class="ai-dots">
+      <div class="ai-dot"></div>
+      <div class="ai-dot"></div>
+      <div class="ai-dot"></div>
+    </div>
+    <div class="ai-steps" id="aiStepsList"></div>
+  </div>
+
+  <!-- ══ RESULTS ══ -->
+  <div id="results" class="fade-in">
+    <div class="results-header">
+      <h2>💡 Your Pricing Intelligence Report</h2>
+      <p id="resultsSubtitle"></p>
+      <div class="confidence-badge" id="confidenceBadge">🎯 <span id="confidenceText">87% Confidence Score</span></div>
+    </div>
+
+    <!-- Price Tiers -->
+    <div class="price-tiers" id="priceTiers"></div>
+
+    <!-- Rate breakdown -->
+    <div class="rate-display" id="rateDisplay"></div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>📊 Scope Breakdown</h3>
+        <div class="chart-wrap"><canvas id="scopeChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>📈 Pricing Tiers</h3>
+        <div class="chart-wrap"><canvas id="tierChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Scope Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon purple">📋</div> Deliverable Cost Breakdown</h2>
+        <p>Estimated hours and cost per deliverable based on complexity scoring</p>
+      </div>
+      <table class="scope-table">
+        <thead>
+          <tr>
+            <th>Deliverable</th>
+            <th style="text-align:center">Complexity</th>
+            <th style="text-align:right">Hours</th>
+            <th style="text-align:right">Cost</th>
+          </tr>
+        </thead>
+        <tbody id="scopeTableBody"></tbody>
+        <tfoot>
+          <tr class="scope-total">
+            <td><strong>TOTAL</strong></td>
+            <td></td>
+            <td class="td-hours" id="totalHours"></td>
+            <td class="td-cost" id="totalCostRow"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Market Position -->
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon cyan">📡</div> Market Position</h2>
+        <p>How your standard rate compares to the market for this region & skill level</p>
+      </div>
+      <div class="market-gauge">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="section-label" style="margin:0">Market Rate Percentile</span>
+          <span id="percentileLabel" style="font-size:1.4rem;font-weight:900;color:var(--cyan)"></span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-needle" id="gaugeNeedle"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>Underpriced</span>
+          <span>Fair Market</span>
+          <span>Premium Tier</span>
+        </div>
+        <div class="market-insight" id="marketInsight"></div>
+      </div>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="card" id="riskCard">
+      <div class="card-header">
+        <h2><div class="step-icon yellow">🛡️</div> Risk Buffer Analysis</h2>
+        <p>Your pricing already includes these protective buffers</p>
+      </div>
+      <div class="risk-summary" id="riskSummaryList"></div>
+    </div>
+
+    <!-- Contract Clauses -->
+    <div class="card">
+      <div class="card-header">
+        <h2><div class="step-icon green">📄</div> Contract Clause Recommendations</h2>
+        <p>AI-generated clauses tailored to your project. Click each to expand and copy.</p>
+      </div>
+      <div class="clause-list" id="clauseList"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn btn-green" onclick="generateQuote()">📋 Generate Client Quote</button>
+      <button class="btn btn-cta" onclick="copyReport()">📤 Copy Full Report</button>
+      <button class="btn btn-secondary" onclick="startOver()">🔄 New Estimate</button>
+    </div>
+    <div id="quoteBox"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════
+// STATE
+// ══════════════════════════════
+const state = {
+  currentStep: 1,
+  skillLevel: 'advanced',
+  urgency: 'flexible',
+  risks: ['new-client'],
+  hours: 40,
+  deliverables: [],
+  results: null
+};
+
+// ══════════════════════════════
+// PRICING DATA
+// ══════════════════════════════
+const BASE_RATES = {
+  beginner:     { min: 20,  max: 40,  typical: 28,  label: 'Beginner' },
+  intermediate: { min: 40,  max: 80,  typical: 58,  label: 'Intermediate' },
+  advanced:     { min: 80,  max: 130, typical: 100, label: 'Advanced' },
+  expert:       { min: 130, max: 250, typical: 175, label: 'Expert' }
+};
+
+const REGIONAL = {
+  'us-tier1':        { mult: 1.45, label: 'USA Major Cities' },
+  'us-tier2':        { mult: 1.00, label: 'USA General' },
+  'canada':          { mult: 0.88, label: 'Canada' },
+  'uk':              { mult: 0.95, label: 'United Kingdom' },
+  'western-europe':  { mult: 0.90, label: 'Western Europe' },
+  'australia':       { mult: 0.93, label: 'Australia/NZ' },
+  'eastern-europe':  { mult: 0.52, label: 'Eastern Europe' },
+  'asia-pacific':    { mult: 0.42, label: 'Asia Pacific' },
+  'latin-america':   { mult: 0.45, label: 'Latin America' },
+  'middle-east':     { mult: 0.60, label: 'Middle East/Africa' }
+};
+
+const PROJECT_MULT = {
+  'web-design':      { mult: 1.00, label: 'Web Design' },
+  'web-development': { mult: 1.25, label: 'Web Development' },
+  'mobile-app':      { mult: 1.30, label: 'Mobile App' },
+  'branding':        { mult: 0.95, label: 'Branding' },
+  'content-writing': { mult: 0.75, label: 'Content Writing' },
+  'social-media':    { mult: 0.80, label: 'Social Media' },
+  'data-analysis':   { mult: 1.30, label: 'Data Analysis' },
+  'ml-ai':           { mult: 1.50, label: 'ML / AI' },
+  'consulting':      { mult: 1.20, label: 'Consulting' },
+  'video-production':{ mult: 1.10, label: 'Video Production' },
+  'other':           { mult: 1.00, label: 'Other' }
+};
+
+const COMPLEXITY_MULT = { simple: 0.85, medium: 1.00, complex: 1.40 };
+
+const URGENCY_MULT = { flexible: 1.00, normal: 1.10, tight: 1.25, rush: 1.50 };
+
+const RISK_DATA = {
+  'new-client':          { pct: 0.15, label: 'New client buffer', emoji: '👤' },
+  'vague-req':           { pct: 0.20, label: 'Unclear requirements', emoji: '❓' },
+  'specialized':         { pct: 0.12, label: 'Specialized skills premium', emoji: '🔬' },
+  'scope-creep':         { pct: 0.25, label: 'Scope creep protection', emoji: '🌊' },
+  'intl-payment':        { pct: 0.08, label: 'International admin', emoji: '🌐' },
+  'ip-complex':          { pct: 0.10, label: 'IP complexity', emoji: '⚖️' },
+  'multiple-reviewers':  { pct: 0.15, label: 'Multi-stakeholder cycles', emoji: '👥' },
+  'no-contract':         { pct: 0.30, label: 'No-contract risk premium', emoji: '🚫' }
+};
+
+const DELIVERABLE_SUGGESTIONS = {
+  'web-design':      ['Homepage Design', 'Mobile Mockups', 'Design System', 'Prototype / Figma File', 'Icon Set', 'Brand Guidelines'],
+  'web-development': ['Frontend Build', 'Backend API', 'Database Schema', 'Authentication', 'Admin Dashboard', 'Deployment Setup'],
+  'mobile-app':      ['iOS App', 'Android App', 'Push Notifications', 'API Integration', 'App Store Submission', 'Analytics Setup'],
+  'branding':        ['Logo Design', 'Brand Identity Guide', 'Color Palette', 'Typography System', 'Business Card', 'Social Media Kit'],
+  'content-writing': ['Blog Posts', 'Landing Page Copy', 'Email Sequence', 'Product Descriptions', 'SEO Research', 'Editorial Calendar'],
+  'social-media':    ['Monthly Content Plan', 'Graphic Templates', 'Captions & Hashtags', 'Story Templates', 'Analytics Report'],
+  'data-analysis':   ['Data Cleaning', 'Dashboard Build', 'Statistical Report', 'Predictive Model', 'Data Visualization', 'Executive Summary'],
+  'ml-ai':           ['Model Training', 'API Endpoint', 'Data Pipeline', 'Model Evaluation Report', 'Documentation', 'Deployment'],
+  'consulting':      ['Discovery Workshop', 'Strategy Document', 'Competitive Analysis', 'Roadmap Presentation', 'Follow-up Sessions'],
+  'video-production':['Script Writing', 'Storyboard', 'Filming', 'Video Editing', 'Motion Graphics', 'Thumbnail Design'],
+  'other':           ['Discovery & Research', 'Core Deliverable', 'Revisions', 'Documentation', 'Handoff / Training']
+};
+
+// ══════════════════════════════
+// WIZARD NAVIGATION
+// ══════════════════════════════
+function goToStep(n) {
+  document.getElementById(`step${state.currentStep}`).classList.add('hidden');
+  document.getElementById(`step${n}`).classList.remove('hidden');
+  document.getElementById(`step${n}`).classList.add('fade-in');
+  setTimeout(() => document.getElementById(`step${n}`).classList.remove('fade-in'), 400);
+  updateProgress(n);
+  state.currentStep = n;
+  window.scrollTo({ top: 80, behavior: 'smooth' });
+}
+
+function validateAndNext(fromStep) {
+  if (fromStep === 1) {
+    const nameInput = document.getElementById('projectName');
+    const nameError = document.getElementById('nameError');
+    if (!nameInput.value.trim()) {
+      nameInput.classList.add('input-error');
+      nameError.style.display = 'block';
+      nameInput.focus();
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return; // STOP — do not advance
+    }
+    // Clear any previous error and proceed
+    nameInput.classList.remove('input-error');
+    nameError.style.display = 'none';
+    goToStep(2);
+    return;
+  }
+
+  if (fromStep === 2) {
+    const delError = document.getElementById('delError');
+    // Must have at least 1 deliverable
+    if (state.deliverables.length === 0) {
+      delError.style.display = 'block';
+      delError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    // Every deliverable must have a non-empty name
+    const hasEmpty = state.deliverables.some(d => !d.name || !d.name.trim());
+    if (hasEmpty) {
+      delError.style.display = 'block';
+      delError.textContent = '⚠️ All deliverables must have a name before continuing.';
+      delError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Highlight empty inputs
+      document.querySelectorAll('.del-name-input').forEach(inp => {
+        if (!inp.value.trim()) inp.classList.add('input-error');
+      });
+      return;
+    }
+    delError.style.display = 'none';
+    goToStep(3);
+    return;
+  }
+}
+
+function clearError(inputId, errorId) {
+  const inp = document.getElementById(inputId);
+  const err = document.getElementById(errorId);
+  if (inp) inp.classList.remove('input-error');
+  if (err) err.style.display = 'none';
+}
+
+function updateProgress(active) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`si${i}`);
+    el.classList.remove('active', 'done');
+    if (i < active) el.classList.add('done');
+    else if (i === active) el.classList.add('active');
+    const bubble = el.querySelector('.step-bubble');
+    if (i < active) bubble.textContent = '✓';
+    else bubble.textContent = i;
+  }
+}
+
+// ══════════════════════════════
+// SKILL LEVEL
+// ══════════════════════════════
+function selectSkill(level, el) {
+  document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.skillLevel = level;
+}
+
+// ══════════════════════════════
+// URGENCY
+// ══════════════════════════════
+function selectUrgency(level, el) {
+  document.querySelectorAll('.urgency-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.urgency = level;
+}
+
+// ══════════════════════════════
+// HOURS SLIDER
+// ══════════════════════════════
+function updateHoursDisplay() {
+  const h = parseInt(document.getElementById('hoursSlider').value);
+  state.hours = h;
+  document.getElementById('hoursVal').textContent = `${h} hrs`;
+  const w40 = (h / 40).toFixed(1);
+  const w20 = (h / 20).toFixed(1);
+  document.getElementById('hoursWeeks').textContent = w40 <= 1 ? '≈ 1 week' : `≈ ${w40} weeks`;
+  document.getElementById('hoursBiWeeks').textContent = w20 <= 1 ? '≈ 1 week' : `≈ ${w20} weeks`;
+}
+
+// ══════════════════════════════
+// RISK FACTORS
+// ══════════════════════════════
+function toggleRisk(id, el) {
+  if (el.classList.contains('checked')) {
+    el.classList.remove('checked');
+    el.querySelector('.risk-check').textContent = '';
+    state.risks = state.risks.filter(r => r !== id);
+  } else {
+    el.classList.add('checked');
+    el.querySelector('.risk-check').textContent = '✓';
+    state.risks.push(id);
+  }
+}
+
+// Init risk check for new-client
+document.addEventListener('DOMContentLoaded', () => {
+  const nc = document.querySelector('[data-risk="new-client"]');
+  if (nc) { nc.classList.add('checked'); nc.querySelector('.risk-check').textContent = '✓'; }
+  updateSuggestions();
+  addDeliverable('Main Deliverable', 'medium');
+  addDeliverable('Revisions & Feedback', 'simple');
+});
+
+// ══════════════════════════════
+// DELIVERABLES
+// ══════════════════════════════
+function updateSuggestions() {
+  const type = document.getElementById('projectType').value;
+  const chips = DELIVERABLE_SUGGESTIONS[type] || [];
+  const container = document.getElementById('suggestionChips');
+  container.innerHTML = chips.map(c =>
+    `<button class="chip" onclick="addDeliverable('${c}', 'medium')">${c}</button>`
+  ).join('');
+}
+
+function addDeliverable(name = '', complexity = 'medium') {
+  const id = 'del_' + Date.now() + Math.random();
+  state.deliverables.push({ id, name, complexity, qty: 1 });
+  renderDeliverables();
+}
+
+function renderDeliverables() {
+  const list = document.getElementById('deliverableList');
+  list.innerHTML = state.deliverables.map((d, i) => `
+    <div class="deliverable-row" id="row_${d.id}">
+      <input type="text" class="del-name-input" value="${d.name}" placeholder="Deliverable name..."
+        oninput="state.deliverables[${i}].name = this.value; this.classList.remove('input-error'); document.getElementById('delError').style.display='none';">
+      <select class="${d.complexity}" onchange="updateComplexity(${i}, this)">
+        <option value="simple" ${d.complexity==='simple'?'selected':''}>Simple</option>
+        <option value="medium" ${d.complexity==='medium'?'selected':''}>Medium</option>
+        <option value="complex" ${d.complexity==='complex'?'selected':''}>Complex</option>
+      </select>
+      <div class="del-qty">
+        ×<input type="number" value="${d.qty}" min="1" max="20"
+          onchange="state.deliverables[${i}].qty = parseInt(this.value)||1">
+      </div>
+      <button class="del-remove" onclick="removeDeliverable('${d.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateComplexity(i, sel) {
+  state.deliverables[i].complexity = sel.value;
+  sel.className = sel.value;
+}
+
+function removeDeliverable(id) {
+  state.deliverables = state.deliverables.filter(d => d.id !== id);
+  renderDeliverables();
+}
+
+// ══════════════════════════════
+// CORE PRICING ENGINE
+// ══════════════════════════════
+function calculatePricing() {
+  const region = document.getElementById('region').value;
+  const projectType = document.getElementById('projectType').value;
+  const hours = state.hours;
+  const skill = state.skillLevel;
+  const urgency = state.urgency;
+
+  const rates = BASE_RATES[skill];
+  const regMult = REGIONAL[region].mult;
+  const projMult = PROJECT_MULT[projectType].mult;
+  const urgMult = URGENCY_MULT[urgency];
+
+  // Effective hourly rates
+  const rateMin = rates.min * regMult * projMult;
+  const rateTypical = rates.typical * regMult * projMult;
+  const rateMax = rates.max * regMult * projMult;
+
+  // Total risk factor
+  let totalRiskPct = state.risks.reduce((sum, r) => sum + (RISK_DATA[r]?.pct || 0), 0);
+  totalRiskPct = Math.min(totalRiskPct, 0.80); // cap at 80%
+
+  // Calculate base project cost
+  let baseCost = rateTypical * hours;
+
+  // Deliverable breakdown
+  let deliverableData = [];
+  const totalDelivHours = hours;
+
+  if (state.deliverables.length > 0) {
+    // Distribute hours across deliverables weighted by complexity
+    const weights = state.deliverables.map(d => COMPLEXITY_MULT[d.complexity] * (d.qty || 1));
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+    deliverableData = state.deliverables.map((d, i) => {
+      const delHours = Math.round((weights[i] / totalWeight) * totalDelivHours * 10) / 10;
+      const delCost = delHours * rateTypical * (d.qty || 1);
+      return {
+        name: d.name || `Deliverable ${i + 1}`,
+        complexity: d.complexity,
+        hours: delHours,
+        qty: d.qty || 1,
+        cost: delCost
+      };
+    });
+  }
+
+  // Three pricing tiers
+  const budgetTotal = rateMin * hours * urgMult;
+  const standardTotal = (rateTypical * hours * urgMult) * (1 + totalRiskPct);
+  const premiumTotal = (rateMax * hours * urgMult) * (1 + totalRiskPct) * 1.20; // +20% brand premium
+
+  // Market percentile (simple heuristic)
+  const marketPercentile = Math.min(95, Math.max(10,
+    30 + (skill === 'beginner' ? 0 : skill === 'intermediate' ? 20 : skill === 'advanced' ? 40 : 60)
+    + (regMult > 1 ? 10 : regMult < 0.6 ? -15 : 0)
+    - (urgency === 'flexible' ? 5 : 0)
+  ));
+
+  // Confidence score
+  const confidence = Math.min(96, Math.max(68,
+    75 + state.deliverables.length * 3
+    + (state.risks.length > 0 ? 5 : 0)
+    - (state.deliverables.length === 0 ? 10 : 0)
+  ));
+
+  return {
+    rateMin: Math.round(rateMin),
+    rateTypical: Math.round(rateTypical),
+    rateMax: Math.round(rateMax),
+    budgetTotal: Math.round(budgetTotal),
+    standardTotal: Math.round(standardTotal),
+    premiumTotal: Math.round(premiumTotal),
+    totalRiskPct,
+    deliverableData,
+    hours,
+    marketPercentile,
+    confidence,
+    region: REGIONAL[region].label,
+    projectType: PROJECT_MULT[projectType].label,
+    skill: BASE_RATES[skill].label,
+    urgencyMult: urgMult
+  };
+}
+
+// ══════════════════════════════
+// RUN ANALYSIS
+// ══════════════════════════════
+function runAnalysis() {
+  if (state.deliverables.length === 0) {
+    addDeliverable('Main Deliverable', 'medium');
+  }
+
+  document.getElementById('step4').classList.add('hidden');
+  document.getElementById('aiThinking').style.display = 'block';
+  updateProgress(5);
+  window.scrollTo({ top: 80, behavior: 'smooth' });
+
+  const steps = [
+    '🔍 Indexing project parameters...',
+    '📊 Matching against market data...',
+    '⚖️ Calculating risk-adjusted rates...',
+    '🧮 Running scope distribution model...',
+    '📝 Generating contract clauses...',
+    '✅ Report ready!'
+  ];
+
+  const stepList = document.getElementById('aiStepsList');
+  stepList.innerHTML = '';
+
+  steps.forEach((s, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'ai-step-item';
+      div.style.animationDelay = '0s';
+      div.textContent = s;
+      stepList.appendChild(div);
+      if (i === steps.length - 1) {
+        div.classList.add('done');
+        setTimeout(showResults, 600);
+      }
+    }, i * 420);
+  });
+}
+
+function showResults() {
+  const r = calculatePricing();
+  state.results = r;
+
+  document.getElementById('aiThinking').style.display = 'none';
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  resultsEl.classList.add('fade-in');
+
+  renderResults(r);
+  window.scrollTo({ top: 80, behavior: 'smooth' });
+}
+
+// ══════════════════════════════
+// RENDER RESULTS
+// ══════════════════════════════
+function renderResults(r) {
+  const name = document.getElementById('projectName').value || 'Your Project';
+
+  document.getElementById('resultsSubtitle').textContent =
+    `${name} · ${r.projectType} · ${r.skill} · ${r.region}`;
+  document.getElementById('confidenceText').textContent =
+    `${r.confidence}% Confidence Score`;
+
+  // Price Tiers
+  document.getElementById('priceTiers').innerHTML = `
+    <div class="price-card budget">
+      <div class="tier-label">🟡 Budget</div>
+      <div class="tier-price">$${fmt(r.budgetTotal)}</div>
+      <div class="tier-hourly">~$${r.rateMin}/hr effective rate</div>
+      <div class="tier-desc">Bare minimum. No risk buffer. Use only for trusted returning clients with clear scope.</div>
+    </div>
+    <div class="price-card standard recommended">
+      <div class="recommended-badge">RECOMMENDED</div>
+      <div class="tier-label">✅ Standard</div>
+      <div class="tier-price">$${fmt(r.standardTotal)}</div>
+      <div class="tier-hourly">~$${r.rateTypical}/hr + ${Math.round(r.totalRiskPct * 100)}% risk buffer</div>
+      <div class="tier-desc">Fair market rate with full risk protection. This is your go-to quote for most clients.</div>
+    </div>
+    <div class="price-card premium">
+      <div class="tier-label">💎 Premium</div>
+      <div class="tier-price">$${fmt(r.premiumTotal)}</div>
+      <div class="tier-hourly">~$${r.rateMax}/hr + brand premium</div>
+      <div class="tier-desc">For enterprise clients, tight deadlines, or when you're the best option. Justifiable & worth asking.</div>
+    </div>
+  `;
+
+  // Rate display
+  document.getElementById('rateDisplay').innerHTML = `
+    <div class="rate-item">
+      <div class="ri-val">$${r.rateMin}–$${r.rateMax}</div>
+      <div class="ri-label">Hourly Rate Range</div>
+    </div>
+    <div class="rate-item">
+      <div class="ri-val">$${r.rateTypical}/hr</div>
+      <div class="ri-label">Market-Fair Rate</div>
+    </div>
+    <div class="rate-item">
+      <div class="ri-val">${r.hours} hrs</div>
+      <div class="ri-label">Estimated Hours</div>
+    </div>
+    <div class="rate-item">
+      <div class="ri-val">${Math.round(r.totalRiskPct * 100)}%</div>
+      <div class="ri-label">Risk Buffer Added</div>
+    </div>
+    <div class="rate-item">
+      <div class="ri-val">${Math.round((r.urgencyMult - 1) * 100)}%</div>
+      <div class="ri-label">Urgency Premium</div>
+    </div>
+  `;
+
+  // Scope Table
+  let tbody = '';
+  r.deliverableData.forEach(d => {
+    tbody += `
+      <tr>
+        <td class="td-name">${d.name}${d.qty > 1 ? ` <span class="text-muted">×${d.qty}</span>` : ''}</td>
+        <td class="td-complexity"><span class="complexity-badge ${d.complexity}">${d.complexity}</span></td>
+        <td class="td-hours">${d.hours} hrs</td>
+        <td class="td-cost">$${fmt(Math.round(d.cost))}</td>
+      </tr>
+    `;
+  });
+  document.getElementById('scopeTableBody').innerHTML = tbody;
+  document.getElementById('totalHours').textContent = r.hours + ' hrs';
+  document.getElementById('totalCostRow').textContent = '$' + fmt(r.standardTotal);
+
+  // Market Gauge
+  const pct = r.marketPercentile;
+  document.getElementById('percentileLabel').textContent = `${pct}th percentile`;
+  setTimeout(() => {
+    document.getElementById('gaugeNeedle').style.left = `${pct}%`;
+  }, 300);
+  document.getElementById('marketInsight').innerHTML = getMarketInsight(pct, r);
+
+  // Risk Summary
+  let riskHTML = '';
+  if (state.risks.length === 0) {
+    riskHTML = '<p class="text-muted" style="padding:1rem 0">No risk factors selected — your base rate has no buffer added. Consider whether this is accurate.</p>';
+  } else {
+    state.risks.forEach(id => {
+      const rd = RISK_DATA[id];
+      if (!rd) return;
+      const pctVal = Math.round(rd.pct * 100);
+      riskHTML += `
+        <div class="risk-row">
+          <div class="rr-label">${rd.emoji} ${rd.label}</div>
+          <div class="rr-bar-wrap"><div class="rr-bar" style="width:${Math.min(100, pctVal * 3)}%"></div></div>
+          <div class="rr-pct">+${pctVal}%</div>
+        </div>
+      `;
+    });
+    const totalBuff = Math.round(r.totalRiskPct * 100);
+    riskHTML += `
+      <div class="risk-row" style="border-color:var(--yellow);background:var(--yellow-dim)">
+        <div class="rr-label"><strong>⚠️ Total Risk Buffer on Standard Quote</strong></div>
+        <div class="rr-bar-wrap"><div class="rr-bar" style="width:${Math.min(100, totalBuff * 1.5)}%"></div></div>
+        <div class="rr-pct"><strong>+${totalBuff}%</strong></div>
+      </div>
+    `;
+  }
+  document.getElementById('riskSummaryList').innerHTML = riskHTML;
+
+  // Contract Clauses
+  renderClauses(r);
+
+  // Charts
+  renderCharts(r);
+}
+
+function getMarketInsight(pct, r) {
+  if (pct < 30) return `You're pricing <strong>below market</strong>. At $${r.rateTypical}/hr you're leaving significant money on the table. The market data suggests you could charge 20–40% more without losing competitive positioning in ${r.region}.`;
+  if (pct < 55) return `You're in the <strong>fair market zone</strong> — priced where most experienced ${r.skill.toLowerCase()} freelancers sit in ${r.region}. This is a safe, competitive rate that should close deals while preserving your margins.`;
+  if (pct < 80) return `You're in the <strong>upper market tier</strong>, which is appropriate for your skill level and project type. Clients paying this rate expect reliability, communication, and proven results — make sure your portfolio reflects that.`;
+  return `You're in <strong>premium territory</strong>. This rate is justified for elite expertise, high-value niches, or enterprise work. Lead with results and ROI in your proposal, not hourly rates.`;
+}
+
+// ══════════════════════════════
+// CONTRACT CLAUSES
+// ══════════════════════════════
+function renderClauses(r) {
+  const clauses = generateClauses(r);
+  const container = document.getElementById('clauseList');
+  container.innerHTML = clauses.map((c, i) => `
+    <div class="clause-item" id="clause_${i}">
+      <div class="clause-header" onclick="toggleClause(${i})">
+        <div class="clause-header-left">
+          <span class="clause-tag ${c.type}">${c.type}</span>
+          <span class="clause-title">${c.title}</span>
+        </div>
+        <span class="clause-toggle">▾</span>
+      </div>
+      <div class="clause-body">
+        <div class="clause-text">
+          ${c.text}
+          <br><br>
+          <button class="copy-clause" onclick="copyClause('${c.title}', \`${c.text.replace(/`/g, "\\`")}\`)">📋 Copy Clause</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function generateClauses(r) {
+  const name = document.getElementById('projectName').value || 'this project';
+  const depositPct = state.risks.includes('new-client') ? 50 : 30;
+  const revisions = state.risks.includes('vague-req') || state.risks.includes('scope-creep') ? 2 : 3;
+  const currency = getCurrency();
+
+  const clauses = [
+    {
+      title: `Deposit & Payment Schedule`,
+      type: 'essential',
+      text: `A non-refundable deposit of ${depositPct}% (${currency}${fmt(Math.round(r.standardTotal * depositPct / 100))}) is due before any work commences on "${name}". The remaining balance is due upon project completion and prior to final file handoff. Invoices unpaid after 14 days are subject to a 1.5% monthly late fee.`
+    },
+    {
+      title: `Scope of Work & Change Orders`,
+      type: 'essential',
+      text: `This agreement covers only the deliverables explicitly listed in the project proposal. Any additional work, features, or revisions beyond the agreed scope will require a written Change Order and may result in additional fees. The Contractor reserves the right to decline out-of-scope requests or re-quote them at the current standard rate of ${currency}${r.rateTypical}/hr.`
+    },
+    {
+      title: `Revision Policy`,
+      type: 'recommended',
+      text: `This project includes ${revisions} rounds of revisions, defined as consolidated feedback submitted within 5 business days of each delivery. Additional revision rounds will be billed at ${currency}${r.rateTypical}/hr. A "revision" is a minor change; a fundamental direction change constitutes new scope and will be quoted separately.`
+    },
+    {
+      title: `Intellectual Property Transfer`,
+      type: state.risks.includes('ip-complex') ? 'essential' : 'recommended',
+      text: `All intellectual property, including final deliverables for "${name}", transfers to the Client upon receipt of full payment. The Contractor retains the right to display the work in their portfolio unless explicitly agreed otherwise in writing. Draft files, unused concepts, and source materials remain the property of the Contractor.`
+    },
+    {
+      title: `Client Responsibilities & Content Deadline`,
+      type: 'recommended',
+      text: `The Client agrees to provide all necessary materials (text, images, credentials, branding assets, and feedback) within 5 business days of each request. Project timelines are contingent on timely client response. Delays caused by the Client may result in a revised delivery date or a project restart fee of 15% if the project is placed on hold for more than 30 days.`
+    },
+    {
+      title: `Cancellation & Kill Fee`,
+      type: 'protection',
+      text: `Should the Client cancel the project after work has begun, the deposit is non-refundable. If more than 25% of the project is complete at time of cancellation, the Client agrees to pay for all completed work at the rate of ${currency}${r.rateTypical}/hr. This protects the Contractor against lost opportunity and work already performed.`
+    }
+  ];
+
+  if (state.risks.includes('intl-payment')) {
+    clauses.push({
+      title: `International Payment Terms`,
+      type: 'protection',
+      text: `All payments must be made in ${currency.replace('$','') || 'USD'} via wire transfer or an agreed international payment platform (e.g., Wise, PayPal Business, or Stripe). The Client is responsible for all transfer fees and currency conversion costs. Payment is considered received only when funds clear the Contractor's account.`
+    });
+  }
+
+  if (state.risks.includes('no-contract')) {
+    clauses.push({
+      title: `Mandatory Written Agreement`,
+      type: 'essential',
+      text: `No work will commence without a signed written agreement outlining project scope, deliverables, timelines, and payment terms. Verbal agreements, email chains, or chat messages do not constitute a binding contract. The Contractor reserves the right to pause or terminate any project that lacks a signed agreement.`
+    });
+  }
+
+  if (state.risks.includes('multiple-reviewers')) {
+    clauses.push({
+      title: `Single Point of Contact`,
+      type: 'protection',
+      text: `The Client agrees to designate a single Point of Contact (POC) with authority to approve decisions and consolidate feedback. Contradictory feedback from multiple stakeholders that requires rework will be treated as a revision and may be subject to additional charges at ${currency}${r.rateTypical}/hr.`
+    });
+  }
+
+  return clauses;
+}
+
+function getCurrency() {
+  const region = document.getElementById('region').value;
+  const map = {
+    'uk': '£', 'western-europe': '€', 'eastern-europe': '€', 'australia': 'A$', 'canada': 'C$'
+  };
+  return map[region] || '$';
+}
+
+function toggleClause(i) {
+  const el = document.getElementById(`clause_${i}`);
+  el.classList.toggle('open');
+}
+
+function copyClause(title, text) {
+  navigator.clipboard.writeText(`${title}\n\n${text}`).then(() => showToast('Clause copied!'));
+}
+
+// ══════════════════════════════
+// CHARTS
+// ══════════════════════════════
+let scopeChartInst = null;
+let tierChartInst = null;
+
+function renderCharts(r) {
+  if (scopeChartInst) scopeChartInst.destroy();
+  if (tierChartInst) tierChartInst.destroy();
+
+  const labels = r.deliverableData.map(d => d.name.length > 18 ? d.name.slice(0,16)+'…' : d.name);
+  const costs = r.deliverableData.map(d => Math.round(d.cost));
+  const colors = ['#00D4FF','#7C3AED','#10B981','#F59E0B','#EF4444','#A855F7','#06B6D4','#8B5CF6'];
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#94A3B8', font: { size: 11 } } } }
+  };
+
+  // Scope donut
+  const scopeCtx = document.getElementById('scopeChart').getContext('2d');
+  scopeChartInst = new Chart(scopeCtx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data: costs, backgroundColor: colors, borderWidth: 2, borderColor: '#111E30' }]
+    },
+    options: {
+      ...chartDefaults,
+      cutout: '65%',
+      plugins: { ...chartDefaults.plugins, legend: { position: 'bottom', labels: { color: '#94A3B8', font: { size: 10 }, boxWidth: 12 } } }
+    }
+  });
+
+  // Tier bar chart
+  const tierCtx = document.getElementById('tierChart').getContext('2d');
+  tierChartInst = new Chart(tierCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Budget', 'Standard ⭐', 'Premium'],
+      datasets: [{
+        data: [r.budgetTotal, r.standardTotal, r.premiumTotal],
+        backgroundColor: ['rgba(100,116,139,0.6)', 'rgba(0,212,255,0.7)', 'rgba(167,139,250,0.7)'],
+        borderColor: ['#64748B', '#00D4FF', '#A78BFA'],
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      ...chartDefaults,
+      scales: {
+        x: { ticks: { color: '#64748B', font: { size: 11 } }, grid: { display: false } },
+        y: {
+          ticks: { color: '#64748B', font: { size: 10 }, callback: v => '$' + fmt(v) },
+          grid: { color: 'rgba(255,255,255,0.04)' }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+// ══════════════════════════════
+// QUOTE GENERATOR
+// ══════════════════════════════
+function generateQuote() {
+  const r = state.results;
+  if (!r) return;
+  const name = document.getElementById('projectName').value || 'Project';
+  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const cur = getCurrency();
+
+  const quote = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  CLIENT PROPOSAL — ${name.toUpperCase()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Prepared: ${today}
+
+SCOPE OF WORK
+─────────────
+${r.deliverableData.map(d => `  • ${d.name} (${d.complexity}) — ${d.hours} hrs`).join('\n')}
+
+INVESTMENT
+──────────
+  Estimated Hours:    ${r.hours} hrs
+  Hourly Rate:        ${cur}${r.rateTypical}/hr
+  Risk & Scope Buffer: +${Math.round(r.totalRiskPct * 100)}%
+
+  ┌─────────────────────────────────┐
+  │  BUDGET OPTION:    ${cur}${fmt(r.budgetTotal).padStart(8)}  │
+  │  STANDARD (rec):   ${cur}${fmt(r.standardTotal).padStart(8)}  │
+  │  PREMIUM TIER:     ${cur}${fmt(r.premiumTotal).padStart(8)}  │
+  └─────────────────────────────────┘
+
+PAYMENT TERMS
+─────────────
+  • ${state.risks.includes('new-client') ? 50 : 30}% deposit due before work begins
+  • Remaining balance due on delivery
+  • This quote is valid for 14 days
+
+To proceed, please reply confirming the
+scope and preferred pricing tier.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Powered by FreelanceIQ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`.trim();
+
+  const box = document.getElementById('quoteBox');
+  box.textContent = quote;
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function copyReport() {
+  const r = state.results;
+  if (!r) return;
+  const text = `FreelanceIQ Analysis — ${document.getElementById('projectName').value || 'Project'}\n\n` +
+    `Standard Recommendation: $${fmt(r.standardTotal)}\n` +
+    `Hourly Rate: $${r.rateTypical}/hr\n` +
+    `Total Hours: ${r.hours}\n` +
+    `Risk Buffer: ${Math.round(r.totalRiskPct * 100)}%\n` +
+    `Market Percentile: ${r.marketPercentile}th\n\n` +
+    `Budget: $${fmt(r.budgetTotal)} | Standard: $${fmt(r.standardTotal)} | Premium: $${fmt(r.premiumTotal)}`;
+  navigator.clipboard.writeText(text).then(() => showToast('Report copied to clipboard!'));
+}
+
+function startOver() {
+  state.currentStep = 1;
+  state.risks = ['new-client'];
+  state.deliverables = [];
+  state.skillLevel = 'advanced';
+  state.urgency = 'flexible';
+  state.hours = 40;
+  state.results = null;
+
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('step1').classList.remove('hidden');
+  updateProgress(1);
+
+  // Reset form
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectDesc').value = '';
+  document.getElementById('hoursSlider').value = 40;
+  updateHoursDisplay();
+  renderDeliverables();
+  addDeliverable('Main Deliverable', 'medium');
+  addDeliverable('Revisions & Feedback', 'simple');
+
+  // Reset skill cards
+  document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.skill-card')[2].classList.add('selected');
+
+  // Reset urgency
+  document.querySelectorAll('.urgency-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.urgency-card')[0].classList.add('selected');
+
+  // Reset risks
+  document.querySelectorAll('.risk-item').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('.risk-check').textContent = '';
+  });
+  const nc = document.querySelector('[data-risk="new-client"]');
+  if (nc) { nc.classList.add('checked'); nc.querySelector('.risk-check').textContent = '✓'; }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════
+// UTILS
+// ══════════════════════════════
+function fmt(n) {
+  return Number(n).toLocaleString('en-US');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

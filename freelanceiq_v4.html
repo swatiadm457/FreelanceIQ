@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreelanceIQ — Scope & Pricing Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+/* ══════════════════════════════════════
+   THEME: WARM BEIGE + STEEL BLUE/COPPER
+══════════════════════════════════════ */
+:root {
+  --bg:       #1C1710;
+  --surface:  #241E15;
+  --card:     #2E261B;
+  --card2:    #382E22;
+  --border:   #453828;
+  --border2:  #594A36;
+
+  /* Primary: steel blue */
+  --rose:         #4A8CB5;
+  --rose-dim:     rgba(74,140,181,0.15);
+  --rose-bright:  #6AAFD8;
+
+  /* Secondary: warm copper/brown */
+  --lavender:     #C07D42;
+  --lav-dim:      rgba(192,125,66,0.15);
+
+  --green:      #5BAD76;
+  --green-dim:  rgba(91,173,118,0.15);
+  --yellow:     #CFA034;
+  --yellow-dim: rgba(207,160,52,0.15);
+  --red:        #C55555;
+  --red-dim:    rgba(197,85,85,0.15);
+
+  --text:   #EDE5D6;
+  --muted:  #6B5F50;
+  --muted2: #9C8D7A;
+
+  --sidebar-w:    260px;
+  --topbar-h:     58px;
+  --bottomnav-h:  60px;
+}
+
+/* ── RESET ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);overflow:hidden;}
+
+/* ══════════════════════════════════════
+   SCREENS
+══════════════════════════════════════ */
+.screen{display:none;width:100%;height:100vh;}
+.screen.active{display:flex;}
+
+/* ══════════════════════════════════════
+   AUTH SCREEN
+══════════════════════════════════════ */
+#authScreen{flex-direction:row;background:var(--bg);}
+
+.auth-brand{
+  flex:1;
+  background:linear-gradient(145deg,#130f08 0%,#1C1710 40%,#0e1520 100%);
+  display:flex;flex-direction:column;justify-content:center;padding:4rem;
+  position:relative;overflow:hidden;
+}
+.auth-brand::before{
+  content:'';position:absolute;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(74,140,181,0.18) 0%,transparent 70%);
+  top:-100px;left:-100px;pointer-events:none;
+}
+.auth-brand::after{
+  content:'';position:absolute;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(192,125,66,0.14) 0%,transparent 70%);
+  bottom:-80px;right:-80px;pointer-events:none;
+}
+.brand-logo{display:flex;align-items:center;gap:.75rem;margin-bottom:3rem;position:relative;z-index:1;}
+.brand-logo-icon{font-size:2rem;}
+.brand-logo-text{font-size:1.8rem;font-weight:800;
+  background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.brand-logo-badge{font-size:.65rem;font-weight:700;letter-spacing:1px;padding:.2rem .55rem;
+  border-radius:10px;background:var(--rose-dim);color:var(--rose);border:1px solid var(--rose);
+  -webkit-text-fill-color:var(--rose);}
+.brand-headline{font-size:2.4rem;font-weight:800;line-height:1.25;margin-bottom:1.25rem;position:relative;z-index:1;}
+.brand-headline span{background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.brand-sub{color:var(--muted2);font-size:1rem;line-height:1.7;margin-bottom:2.5rem;max-width:380px;position:relative;z-index:1;}
+.brand-features{display:flex;flex-direction:column;gap:.9rem;position:relative;z-index:1;}
+.brand-feature{display:flex;align-items:center;gap:.85rem;font-size:.9rem;color:var(--muted2);}
+.brand-feature-dot{width:32px;height:32px;border-radius:8px;background:var(--rose-dim);
+  border:1px solid var(--rose);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+.brand-stats{display:flex;gap:2rem;margin-top:3rem;position:relative;z-index:1;}
+.brand-stat-val{font-size:1.4rem;font-weight:800;color:var(--rose);}
+.brand-stat-lbl{font-size:.75rem;color:var(--muted2);margin-top:.15rem;}
+
+/* right form panel */
+.auth-form-panel{
+  width:440px;min-width:380px;
+  background:var(--surface);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;overflow-y:auto;
+}
+.auth-form-title{font-size:1.5rem;font-weight:800;margin-bottom:.4rem;}
+.auth-form-sub{font-size:.875rem;color:var(--muted2);margin-bottom:2rem;}
+.auth-tabs{display:flex;gap:0;margin-bottom:2rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.auth-tab{flex:1;padding:.65rem;font-size:.875rem;font-weight:600;cursor:pointer;
+  background:transparent;border:none;color:var(--muted2);transition:all .2s;font-family:inherit;}
+.auth-tab.active{background:var(--rose);color:#fff;}
+.auth-form{display:flex;flex-direction:column;gap:1rem;}
+.auth-form-group{display:flex;flex-direction:column;gap:.4rem;}
+.auth-form-group label{font-size:.8rem;font-weight:600;color:var(--muted2);}
+.auth-input{padding:.75rem 1rem;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:.9rem;font-family:inherit;
+  transition:border-color .2s,box-shadow .2s;width:100%;}
+.auth-input:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-dim);}
+.auth-input::placeholder{color:var(--muted);}
+.auth-btn{padding:.85rem;background:linear-gradient(135deg,var(--rose),#2E6A90);
+  color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;
+  cursor:pointer;transition:all .25s;font-family:inherit;box-shadow:0 4px 20px rgba(74,140,181,.3);}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(74,140,181,.45);}
+.auth-divider{display:flex;align-items:center;gap:.75rem;color:var(--muted);font-size:.8rem;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-link{color:var(--rose);font-size:.82rem;text-align:center;cursor:pointer;margin-top:.5rem;}
+.auth-link:hover{text-decoration:underline;}
+.auth-error{background:var(--red-dim);border:1px solid var(--red);border-radius:8px;
+  padding:.65rem 1rem;color:var(--red);font-size:.82rem;display:none;}
+.auth-error.show{display:block;}
+select.auth-input option{background:var(--card);}
+
+@media(max-width:768px){
+  #authScreen{flex-direction:column;}
+  .auth-brand{padding:2rem;flex:none;min-height:35vh;}
+  .brand-headline{font-size:1.6rem;}
+  .brand-features{display:none;}
+  .brand-stats{margin-top:1rem;}
+  .auth-form-panel{width:100%;min-width:0;padding:2rem 1.5rem;flex:1;}
+}
+
+/* ══════════════════════════════════════
+   WELCOME SCREEN
+══════════════════════════════════════ */
+#welcomeScreen{
+  flex-direction:column;align-items:center;justify-content:center;
+  background:var(--bg);padding:2rem;position:relative;overflow:hidden;
+}
+#welcomeScreen::before{
+  content:'';position:fixed;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(74,140,181,0.08) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.welcome-logo{font-size:2.5rem;margin-bottom:.75rem;}
+.welcome-hi{font-size:2.5rem;font-weight:800;text-align:center;margin-bottom:.5rem;}
+.welcome-hi span{background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.welcome-sub{color:var(--muted2);font-size:1rem;text-align:center;margin-bottom:3rem;}
+.welcome-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;
+  max-width:780px;width:100%;margin-bottom:2.5rem;}
+.welcome-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.75rem;cursor:pointer;transition:all .25s;text-align:center;position:relative;z-index:1;}
+.welcome-card:hover{border-color:var(--rose);transform:translateY(-4px);box-shadow:0 12px 32px rgba(74,140,181,.15);}
+.welcome-card.primary{border-color:var(--rose);background:var(--rose-dim);}
+.wc-icon{font-size:2rem;margin-bottom:.75rem;}
+.wc-title{font-size:1rem;font-weight:700;margin-bottom:.35rem;}
+.wc-desc{font-size:.8rem;color:var(--muted2);line-height:1.5;}
+.welcome-skip{color:var(--muted);font-size:.82rem;cursor:pointer;position:relative;z-index:1;}
+.welcome-skip:hover{color:var(--muted2);}
+@media(max-width:600px){.welcome-cards{grid-template-columns:1fr;}}
+
+/* ══════════════════════════════════════
+   MAIN APP SCREEN
+══════════════════════════════════════ */
+#appScreen{flex-direction:column;height:100vh;overflow:hidden;}
+
+/* ── Mode: Desktop ── */
+body.mode-desktop #appScreen{flex-direction:row;}
+body.mode-desktop .app-sidebar{display:flex;}
+body.mode-desktop .app-topbar{display:flex;}
+body.mode-desktop .app-bottomnav{display:none;}
+body.mode-desktop .app-main{flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:0;}
+
+/* ── Mode: Mobile — shows a phone frame ── */
+body.mode-mobile{
+  background:#0D0A06;
+  align-items:center!important;
+  justify-content:center!important;
+  display:flex!important;
+  overflow:hidden;
+}
+body.mode-mobile #appScreen{
+  width:390px;
+  height:844px;
+  max-width:390px;
+  max-height:844px;
+  border-radius:46px;
+  border:9px solid #2A2218;
+  box-shadow:0 0 0 1px #4A3C28, 0 40px 120px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+  flex-direction:column;
+  position:relative;
+}
+/* Phone notch bar */
+body.mode-mobile #appScreen::before{
+  content:'';
+  position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:120px;height:28px;
+  background:#0D0A06;
+  border-radius:0 0 18px 18px;
+  z-index:9999;
+  pointer-events:none;
+}
+body.mode-mobile .app-sidebar{display:none;}
+body.mode-mobile .app-topbar{
+  display:flex;
+  padding-top:32px; /* space for notch */
+  min-height:calc(var(--topbar-h) + 28px);
+}
+body.mode-mobile .app-bottomnav{display:flex;}
+body.mode-mobile .app-main{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;
+  padding-bottom:var(--bottomnav-h);
+}
+/* Constrain content in mobile mode */
+body.mode-mobile .content{padding:.85rem;}
+
+/* ── Sidebar ── */
+.app-sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  height:100vh;flex-direction:column;
+  background:var(--surface);border-right:1px solid var(--border);overflow:hidden;
+}
+.sb-logo{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
+.sb-logo-text{font-size:1.15rem;font-weight:800;
+  background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-badge{font-size:.58rem;font-weight:700;letter-spacing:.8px;padding:.15rem .45rem;
+  border-radius:8px;background:var(--rose-dim);color:var(--rose);border:1px solid var(--rose);-webkit-text-fill-color:var(--rose);}
+
+.sb-user{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--lavender));
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0;}
+.sb-user-name{font-size:.875rem;font-weight:600;color:var(--text);}
+.sb-user-role{font-size:.72rem;color:var(--muted2);}
+
+.sb-project{padding:.7rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sb-project-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.25rem;}
+.sb-project-name{font-size:.85rem;font-weight:600;color:var(--rose);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.sb-nav{flex:1;overflow-y:auto;padding:.4rem 0;}
+.nav-group-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);padding:.55rem 1.25rem .2rem;}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.55rem 1.25rem;
+  cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:.85rem;color:var(--muted2);}
+.nav-item:hover{background:var(--card);color:var(--text);}
+.nav-item.active{background:var(--rose-dim);border-left-color:var(--rose);color:var(--rose);font-weight:600;}
+.nav-icon{width:18px;text-align:center;flex-shrink:0;}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin-left:auto;flex-shrink:0;}
+.nav-item.active .nav-dot,.nav-item.done .nav-dot{background:var(--rose);}
+
+.sb-stats{border-top:1px solid var(--border);padding:.85rem 1.25rem;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.sb-stat{background:var(--card);border-radius:8px;padding:.55rem .7rem;border:1px solid var(--border);}
+.sb-stat-val{font-size:.9rem;font-weight:700;color:var(--rose);}
+.sb-stat-lbl{font-size:.62rem;color:var(--muted);margin-top:.1rem;}
+.sb-stat.full{grid-column:1/-1;}
+.sb-stat.full .sb-stat-val{color:var(--green);}
+
+.sb-logout{padding:.75rem 1.25rem;border-top:1px solid var(--border);flex-shrink:0;}
+.sb-logout button{width:100%;padding:.55rem;font-size:.8rem;background:transparent;
+  border:1px solid var(--border);border-radius:8px;color:var(--muted2);cursor:pointer;font-family:inherit;transition:all .2s;}
+.sb-logout button:hover{border-color:var(--red);color:var(--red);}
+
+/* ── Top Bar ── */
+.app-topbar{
+  height:var(--topbar-h);min-height:var(--topbar-h);flex-shrink:0;
+  background:rgba(28,23,16,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  align-items:center;justify-content:space-between;padding:0 1.25rem;z-index:200;
+}
+.topbar-left{display:flex;align-items:center;gap:.85rem;}
+.topbar-logo{font-size:1rem;font-weight:800;
+  background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.topbar-title{font-size:.95rem;font-weight:700;}
+.topbar-sub{font-size:.72rem;color:var(--muted2);}
+.topbar-right{display:flex;align-items:center;gap:.5rem;}
+
+/* Mode toggle pill */
+.mode-toggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:.2rem;gap:.15rem;}
+.mode-btn{padding:.3rem .75rem;border-radius:16px;border:none;font-size:.75rem;
+  font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted2);font-family:inherit;}
+.mode-btn.active{background:var(--rose);color:#fff;}
+
+/* ── Bottom Nav (mobile) ── */
+.app-bottomnav{
+  position:absolute;bottom:0;left:0;right:0;height:var(--bottomnav-h);
+  background:var(--surface);border-top:1px solid var(--border);
+  align-items:center;justify-content:space-around;z-index:200;
+}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  cursor:pointer;padding:.5rem .75rem;border-radius:10px;transition:all .2s;
+  font-size:.62rem;color:var(--muted2);font-weight:600;}
+.bnav-item:hover{color:var(--text);}
+.bnav-item.active{color:var(--rose);}
+.bnav-icon{font-size:1.1rem;}
+
+/* ── Main Content ── */
+.app-main{}
+.content{padding:1.5rem;}
+@media(max-width:600px){.content{padding:1rem;}}
+
+/* ══════════════════════════════════════
+   PANELS
+══════════════════════════════════════ */
+.panel{display:none;animation:fadeUp .25s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:.3rem;}
+.section-sub{color:var(--muted2);margin-bottom:1.5rem;font-size:.875rem;}
+
+/* ══════════════════════════════════════
+   FORMS
+══════════════════════════════════════ */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.25rem;}
+.form-group{display:flex;flex-direction:column;gap:.35rem;}
+.form-group label{font-size:.78rem;font-weight:600;color:var(--muted2);}
+input[type=text],input[type=number],input[type=date],textarea,select{
+  padding:.65rem .9rem;background:var(--card);border:1px solid var(--border);
+  border-radius:9px;color:var(--text);font-size:.875rem;font-family:inherit;
+  transition:border-color .2s,box-shadow .2s;width:100%;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-dim);}
+textarea{min-height:80px;resize:vertical;}
+select option{background:var(--card);}
+
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+button{border:none;border-radius:9px;padding:.6rem 1.2rem;font-size:.875rem;
+  font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+.btn-primary{background:linear-gradient(135deg,var(--rose),#2E6A90);color:#fff;
+  box-shadow:0 4px 16px rgba(74,140,181,.25);}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(74,140,181,.4);transform:translateY(-1px);}
+.btn-secondary{background:transparent;color:var(--rose);border:1px solid var(--rose);}
+.btn-secondary:hover{background:var(--rose-dim);}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--card);color:var(--text);border-color:var(--border2);}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);padding:.25rem .55rem;font-size:.75rem;}
+.btn-danger:hover{background:var(--red-dim);}
+.btn-warn{background:transparent;color:var(--yellow);border:1px solid var(--yellow);padding:.25rem .55rem;font-size:.78rem;}
+.btn-warn:hover{background:var(--yellow-dim);}
+.btn-sm{padding:.35rem .85rem;font-size:.78rem;}
+.btn-row{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1.25rem;}
+
+/* ══════════════════════════════════════
+   CARDS / BOXES
+══════════════════════════════════════ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:1.4rem;}
+.card+.card{margin-top:1rem;}
+.info-box{background:var(--lav-dim);border:1px solid var(--lavender);border-radius:10px;
+  padding:.9rem 1.15rem;color:var(--lavender);font-size:.85rem;margin:.75rem 0;}
+.warn-box{background:var(--yellow-dim);border:1px solid var(--yellow);border-radius:10px;
+  padding:.9rem 1.15rem;color:var(--yellow);font-size:.85rem;margin:.75rem 0;}
+.success-box{background:var(--green-dim);border:1px solid var(--green);border-radius:10px;
+  padding:.9rem 1.15rem;color:var(--green);font-size:.85rem;margin:.75rem 0;}
+
+/* ══════════════════════════════════════
+   DASHBOARD PANEL
+══════════════════════════════════════ */
+.dash-welcome{margin-bottom:1.5rem;}
+.dash-welcome h1{font-size:1.6rem;font-weight:800;margin-bottom:.3rem;}
+.dash-welcome h1 span{background:linear-gradient(135deg,var(--rose),var(--lavender));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem;margin-bottom:1.5rem;}
+.ds-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;}
+.ds-val{font-size:1.5rem;font-weight:800;color:var(--rose);}
+.ds-lbl{font-size:.72rem;color:var(--muted2);margin-top:.2rem;}
+.dash-qs{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.85rem;}
+.qs-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:1.15rem;cursor:pointer;transition:all .2s;}
+.qs-card:hover{border-color:var(--rose);box-shadow:0 6px 20px rgba(74,140,181,.12);transform:translateY(-2px);}
+.qs-card.featured{border-color:var(--rose);background:var(--rose-dim);}
+.qs-icon{font-size:1.5rem;margin-bottom:.5rem;}
+.qs-title{font-size:.9rem;font-weight:700;margin-bottom:.25rem;}
+.qs-desc{font-size:.75rem;color:var(--muted2);line-height:1.5;}
+
+/* ══════════════════════════════════════
+   SCOPE BUILDER
+══════════════════════════════════════ */
+.scope-layout{display:grid;grid-template-columns:180px 1fr;gap:1.15rem;}
+@media(max-width:600px){.scope-layout{grid-template-columns:1fr;}}
+.scope-catnav{display:flex;flex-direction:column;gap:.25rem;}
+.scope-cat-btn{display:flex;align-items:center;gap:.55rem;padding:.55rem .8rem;
+  border-radius:8px;cursor:pointer;font-size:.82rem;color:var(--muted2);
+  border:1px solid transparent;transition:all .15s;background:transparent;text-align:left;font-family:inherit;font-weight:500;}
+.scope-cat-btn:hover{background:var(--card);color:var(--text);}
+.scope-cat-btn.active{background:var(--card2);border-color:var(--border2);color:var(--text);font-weight:700;}
+.cat-count{margin-left:auto;font-size:.67rem;background:var(--border2);padding:.1rem .38rem;border-radius:8px;color:var(--muted2);}
+.scope-cat-btn.active .cat-count{background:var(--rose-dim);color:var(--rose);}
+
+.scope-items-area{display:flex;flex-direction:column;gap:.85rem;}
+.scope-items-hdr{display:flex;align-items:center;justify-content:space-between;}
+.scope-items-hdr h3{font-size:.95rem;font-weight:700;}
+.scope-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.65rem;}
+.scope-tile{background:var(--surface);border:2px solid var(--border);border-radius:10px;
+  padding:.85rem;cursor:pointer;transition:all .2s;position:relative;}
+.scope-tile:hover{border-color:var(--border2);transform:translateY(-2px);}
+.scope-tile.selected{border-color:var(--rose);background:var(--rose-dim);}
+.st-check{position:absolute;top:.45rem;right:.45rem;width:17px;height:17px;
+  border-radius:50%;background:var(--border);display:flex;align-items:center;
+  justify-content:center;font-size:.58rem;transition:all .2s;}
+.scope-tile.selected .st-check{background:var(--rose);color:#fff;}
+.st-name{font-size:.82rem;font-weight:600;margin-bottom:.25rem;padding-right:18px;line-height:1.3;}
+.st-meta{font-size:.68rem;color:var(--muted2);}
+/* Difficulty mini bar on tiles */
+.st-diff{display:flex;align-items:center;gap:.3rem;margin-top:.45rem;}
+.st-diff-label{font-size:.62rem;color:var(--muted);flex-shrink:0;}
+.st-diff-bar{display:flex;gap:2px;flex:1;}
+.st-diff-seg{height:4px;flex:1;border-radius:2px;background:var(--border2);}
+.st-diff-seg.on-easy{background:var(--green);}
+.st-diff-seg.on-medium{background:var(--yellow);}
+.st-diff-seg.on-hard{background:var(--red);}
+
+.scope-divider{border:none;border-top:1px solid var(--border);margin:.85rem 0;}
+.scope-table-title{font-size:.82rem;font-weight:700;color:var(--muted2);margin-bottom:.6rem;}
+.scope-table-title span{color:var(--rose);}
+
+/* ══════════════════════════════════════
+   TABLES
+══════════════════════════════════════ */
+.tbl-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--card2);}
+th{padding:.6rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--rose);border-bottom:1px solid var(--border);}
+td{padding:.6rem 1rem;border-bottom:1px solid var(--border);font-size:.84rem;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--card);}
+.complexity-mini{display:flex;gap:.25rem;}
+.cplx-btn{padding:.22rem .48rem;font-size:.68rem;border-radius:5px;cursor:pointer;
+  border:1px solid var(--border);background:var(--card);color:var(--muted2);transition:all .12s;}
+.cplx-btn.sel-s{background:var(--green);border-color:var(--green);color:#fff;}
+.cplx-btn.sel-m{background:var(--yellow);border-color:var(--yellow);color:#000;}
+.cplx-btn.sel-c{background:var(--red);border-color:var(--red);color:#fff;}
+.tbl-total td{font-weight:700;background:var(--card2);color:var(--rose);}
+
+/* ══════════════════════════════════════
+   OPTION CARDS
+══════════════════════════════════════ */
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.65rem;margin:.65rem 0;}
+.opt-card{background:var(--surface);border:2px solid var(--border);border-radius:10px;
+  padding:.9rem;text-align:center;cursor:pointer;transition:all .2s;}
+.opt-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.opt-card.selected{background:var(--rose-dim);border-color:var(--rose);}
+.oc-icon{font-size:1.35rem;margin-bottom:.3rem;}
+.oc-title{font-weight:700;font-size:.85rem;}
+.oc-sub{font-size:.72rem;color:var(--muted2);margin-top:.15rem;}
+
+/* ══════════════════════════════════════
+   RISK CARDS
+══════════════════════════════════════ */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.65rem;}
+.risk-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:.9rem 1.1rem;cursor:pointer;display:flex;align-items:flex-start;gap:.7rem;transition:all .2s;}
+.risk-card:hover,.risk-card.checked{border-color:var(--yellow);background:var(--yellow-dim);}
+.risk-card input[type=checkbox]{accent-color:var(--yellow);width:15px;height:15px;margin-top:.15rem;flex-shrink:0;}
+.risk-title{font-weight:600;font-size:.83rem;}
+.risk-impact{color:var(--yellow);font-weight:700;font-size:.77rem;margin-top:.15rem;}
+
+/* ══════════════════════════════════════
+   PRICING TIERS
+══════════════════════════════════════ */
+.tiers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1rem 0;}
+.tier{background:var(--surface);border:2px solid var(--border);border-radius:13px;padding:1.35rem;text-align:center;transition:all .2s;}
+.tier:hover{transform:translateY(-4px);}
+.tier.std{border-color:var(--rose);box-shadow:0 0 24px rgba(74,140,181,.15);}
+.tier.prem{border-color:var(--lavender);box-shadow:0 0 24px rgba(192,125,66,.15);}
+.tier-badge{display:inline-block;font-size:.67rem;font-weight:700;padding:.18rem .55rem;
+  border-radius:20px;margin-bottom:.65rem;background:var(--rose);color:#fff;}
+.tier.prem .tier-badge{background:var(--lavender);}
+.tier-name{font-size:.95rem;font-weight:700;margin-bottom:.45rem;}
+.tier-amt{font-size:1.9rem;font-weight:800;color:var(--rose);margin-bottom:.2rem;}
+.tier.prem .tier-amt{color:var(--lavender);}
+.tier-rate{font-size:.77rem;color:var(--muted2);margin-bottom:.65rem;}
+.tier-desc{font-size:.79rem;color:var(--muted2);line-height:1.6;}
+
+/* ══════════════════════════════════════
+   PRICE BREAKDOWN BOX
+══════════════════════════════════════ */
+.price-calc-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.1rem;margin:.85rem 0;}
+.price-calc-box h4{font-size:.82rem;font-weight:700;color:var(--muted2);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:.9rem;}
+.pcb-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.45rem 0;border-bottom:1px solid var(--border);font-size:.83rem;}
+.pcb-row:last-child{border-bottom:none;font-weight:700;color:var(--rose);font-size:.9rem;}
+.pcb-label{color:var(--muted2);}
+.pcb-val{font-weight:600;}
+.pcb-val.plus{color:var(--yellow);}
+.pcb-val.total{color:var(--rose);}
+.pcb-note{font-size:.72rem;color:var(--muted);margin-top:.6rem;font-style:italic;}
+
+/* ══════════════════════════════════════
+   BREAKDOWN / CHARTS
+══════════════════════════════════════ */
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.65rem;margin:.85rem 0;}
+.bk-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.8rem;}
+.bk-label{font-size:.7rem;color:var(--muted2);margin-bottom:.25rem;}
+.bk-value{font-size:1rem;font-weight:700;color:var(--rose);}
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.1rem;margin:1.1rem 0;}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.15rem;}
+.chart-box h4{font-size:.85rem;font-weight:700;color:var(--rose);margin-bottom:.85rem;}
+.chart-canvas{position:relative;height:200px;}
+
+/* ══════════════════════════════════════
+   GAUGE
+══════════════════════════════════════ */
+.gauge-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.15rem;margin:.85rem 0;}
+.gauge-wrap h4{font-size:.85rem;font-weight:700;color:var(--rose);margin-bottom:.65rem;}
+.gauge-bar{height:22px;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));
+  border-radius:11px;position:relative;margin-bottom:.65rem;}
+.gauge-needle{position:absolute;top:0;width:3px;height:100%;background:#fff;border-radius:2px;box-shadow:0 0 5px rgba(255,255,255,.5);}
+.gauge-dot{position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);cursor:default;}
+.gauge-dot-label{position:absolute;top:100%;transform:translateX(-50%);
+  font-size:.6rem;color:var(--muted2);white-space:nowrap;margin-top:.3rem;font-weight:600;}
+.gauge-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted2);margin-top:1.4rem;}
+
+/* ══════════════════════════════════════
+   CLAUSES
+══════════════════════════════════════ */
+.clauses-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:.65rem 0;}
+.clause-item{border-bottom:1px solid var(--border);}
+.clause-item:last-child{border-bottom:none;}
+.clause-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.15rem;cursor:pointer;background:var(--card);transition:background .2s;}
+.clause-hdr:hover{background:var(--card2);}
+.clause-tag{font-size:.62rem;font-weight:700;padding:.13rem .42rem;border-radius:4px;text-transform:uppercase;margin-right:.45rem;}
+.clause-tag.essential{background:var(--red-dim);color:var(--red);}
+.clause-tag.recommended{background:var(--yellow-dim);color:var(--yellow);}
+.clause-tag.protection{background:var(--green-dim);color:var(--green);}
+.clause-body{display:none;padding:.9rem 1.15rem;color:var(--muted2);font-size:.83rem;line-height:1.7;}
+.clause-body.open{display:block;}
+.clause-chevron{color:var(--muted);transition:transform .2s;}
+.clause-chevron.open{transform:rotate(180deg);}
+
+/* ══════════════════════════════════════
+   COLLAPSIBLE
+══════════════════════════════════════ */
+.collapsible{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:.75rem 0;}
+.coll-hdr{display:flex;justify-content:space-between;align-items:center;
+  padding:.9rem 1.15rem;background:var(--card);cursor:pointer;font-weight:700;
+  color:var(--rose);font-size:.875rem;}
+.coll-hdr:hover{background:var(--card2);}
+.coll-body{display:none;padding:1.15rem;border-top:1px solid var(--border);}
+.coll-body.open{display:block;}
+
+/* ══════════════════════════════════════
+   TIMELINE
+══════════════════════════════════════ */
+.tl-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.85rem;margin-bottom:1rem;}
+.tl-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.65rem;margin:.65rem 0;}
+.ts-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:.75rem;text-align:center;}
+.ts-val{font-size:1.1rem;font-weight:700;color:var(--rose);}
+.ts-lbl{font-size:.68rem;color:var(--muted2);margin-top:.15rem;}
+.gantt-wrap{overflow-x:auto;margin-top:.85rem;}
+.gantt-table{width:100%;border-collapse:collapse;font-size:.77rem;min-width:500px;}
+.gantt-table th{padding:.45rem .65rem;background:var(--card2);color:var(--rose);
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--border);}
+.gantt-table td{border:1px solid var(--border);padding:.35rem .4rem;vertical-align:middle;}
+.g-name{font-weight:600;padding:.35rem .7rem!important;min-width:140px;}
+.gantt-bar{height:18px;border-radius:4px;background:linear-gradient(90deg,var(--rose),var(--lavender));min-width:8px;}
+.gantt-bar.alt{background:linear-gradient(90deg,var(--lavender),var(--rose));}
+
+/* ══════════════════════════════════════
+   BENCHMARKING
+══════════════════════════════════════ */
+.bench-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+@media(max-width:700px){.bench-layout{grid-template-columns:1fr;}}
+.mc-row{display:grid;grid-template-columns:130px 1fr 65px;gap:.65rem;align-items:center;font-size:.82rem;margin-bottom:.45rem;}
+.mc-bar-bg{background:var(--border);border-radius:4px;height:9px;overflow:hidden;}
+.mc-bar-fill{height:100%;border-radius:4px;transition:width .5s;}
+.mc-val{text-align:right;font-weight:700;color:var(--rose);}
+.mc-label{color:var(--muted2);}
+.mc-row.you .mc-label{color:var(--rose);font-weight:700;}
+.raise-calc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-top:.85rem;}
+.raise-calc h4{font-size:.87rem;font-weight:700;margin-bottom:.65rem;}
+.slider-wrap{margin:.65rem 0;}
+.slider-label-row{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.35rem;}
+.slider-label-row .val{font-weight:700;color:var(--rose);}
+input[type=range]{width:100%;height:4px;border-radius:3px;background:var(--border);
+  outline:none;-webkit-appearance:none;appearance:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--rose);cursor:pointer;box-shadow:0 0 6px rgba(74,140,181,.4);}
+.raise-result{background:var(--green-dim);border:1px solid var(--green);border-radius:8px;
+  padding:.75rem;text-align:center;margin-top:.65rem;}
+.rr-val{font-size:1.3rem;font-weight:800;color:var(--green);}
+.rr-lbl{font-size:.72rem;color:var(--muted2);margin-top:.15rem;}
+
+/* ══════════════════════════════════════
+   PROPOSAL
+══════════════════════════════════════ */
+.proposal-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+@media(max-width:700px){.proposal-layout{grid-template-columns:1fr;}}
+.proposal-preview{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:1.35rem;font-size:.79rem;line-height:1.85;color:var(--muted2);
+  max-height:72vh;overflow-y:auto;font-family:'Courier New',monospace;white-space:pre-wrap;}
+
+/* ══════════════════════════════════════
+   PLATFORMS
+══════════════════════════════════════ */
+.platforms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem;}
+.plat-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:1.1rem;transition:all .2s;}
+.plat-card:hover{transform:translateY(-3px);}
+.plat-card.rec{border-color:var(--rose);box-shadow:0 0 20px rgba(74,140,181,.15);}
+.plat-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;}
+.plat-emoji{font-size:1.3rem;}
+.plat-name{font-weight:700;font-size:.9rem;}
+.plat-tagline{font-size:.75rem;color:var(--muted2);margin-bottom:.6rem;}
+.plat-badge{display:inline-block;font-size:.67rem;font-weight:700;padding:.17rem .55rem;border-radius:20px;margin-bottom:.6rem;}
+.plat-badge.rec-b{background:var(--rose);color:#fff;}
+.plat-badge.fee-b{background:var(--rose-dim);color:var(--rose);}
+.plat-takehome{font-size:1.5rem;font-weight:800;color:var(--green);}
+.plat-bar-bg{height:6px;background:var(--border);border-radius:3px;margin:.4rem 0 .6rem;}
+.plat-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose),var(--lavender));transition:width .5s;}
+.plat-pro,.plat-con{font-size:.75rem;display:flex;gap:.35rem;margin-bottom:.25rem;}
+.plat-pro::before{content:'●';color:var(--green);}
+.plat-con::before{content:'●';color:var(--red);}
+.plat-bestfor{font-size:.72rem;color:var(--muted2);border-top:1px solid var(--border);padding-top:.6rem;margin-top:.6rem;}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green);color:#fff;
+  padding:.75rem 1.15rem;border-radius:9px;font-weight:600;font-size:.83rem;
+  box-shadow:0 6px 22px rgba(0,0,0,.4);z-index:9999;
+  animation:tIn .28s ease,tOut .28s ease 2.5s forwards;}
+@keyframes tIn{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes tOut{to{transform:translateY(60px);opacity:0}}
+
+/* Reset confirm modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8000;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:2rem;max-width:380px;width:90%;text-align:center;}
+.modal-icon{font-size:2.5rem;margin-bottom:.75rem;}
+.modal-title{font-size:1.1rem;font-weight:800;margin-bottom:.5rem;}
+.modal-sub{font-size:.85rem;color:var(--muted2);line-height:1.6;margin-bottom:1.5rem;}
+.modal-btns{display:flex;gap:.75rem;justify-content:center;}
+
+/* ══════════════════════════════════════
+   PRINT
+══════════════════════════════════════ */
+@media print{
+  .app-sidebar,.app-topbar,.app-bottomnav,.btn-row,.topbar-right{display:none!important;}
+  .app-main,.panel{height:auto;overflow:visible;}
+  .panel{display:block!important;}
+  body{background:#fff;color:#000;}
+}
+</style>
+</head>
+<body class="mode-desktop">
+
+<!-- Reset confirm modal -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-box">
+    <div class="modal-icon">🔄</div>
+    <div class="modal-title">Reset Project?</div>
+    <div class="modal-sub">This will clear all scope, project details, and pricing data. Your account stays logged in.</div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="document.getElementById('resetModal').classList.remove('show')">Cancel</button>
+      <button class="btn-primary" onclick="confirmReset()">Yes, Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: AUTH
+══════════════════════════════════════ -->
+<div id="authScreen" class="screen active">
+  <div class="auth-brand">
+    <div class="brand-logo">
+      <span class="brand-logo-icon">⚡</span>
+      <span class="brand-logo-text">FreelanceIQ</span>
+      <span class="brand-logo-badge">BETA</span>
+    </div>
+    <h1 class="brand-headline">Price your work.<br><span>Own your value.</span></h1>
+    <p class="brand-sub">AI-powered scope estimation, risk analysis, and proposal generation — built for freelancers who charge what they're worth.</p>
+    <div class="brand-features">
+      <div class="brand-feature"><div class="brand-feature-dot">🗂️</div>Visual scope builder with 70+ deliverables</div>
+      <div class="brand-feature"><div class="brand-feature-dot">📊</div>3-tier pricing with risk-adjusted buffers</div>
+      <div class="brand-feature"><div class="brand-feature-dot">📅</div>Auto Gantt timeline from your scope</div>
+      <div class="brand-feature"><div class="brand-feature-dot">📄</div>One-click client proposal generator</div>
+      <div class="brand-feature"><div class="brand-feature-dot">📈</div>Market rate benchmarking by region</div>
+    </div>
+    <div class="brand-stats">
+      <div><div class="brand-stat-val">47K+</div><div class="brand-stat-lbl">Freelancers</div></div>
+      <div><div class="brand-stat-val">12</div><div class="brand-stat-lbl">Regions</div></div>
+      <div><div class="brand-stat-val">$2.4M+</div><div class="brand-stat-lbl">Scoped</div></div>
+    </div>
+  </div>
+
+  <div class="auth-form-panel">
+    <div class="auth-form-title" id="authTitle">Welcome back</div>
+    <div class="auth-form-sub" id="authSub">Sign in to your FreelanceIQ account</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="auth-form">
+      <div class="auth-form-group">
+        <label>Email address</label>
+        <input class="auth-input" type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="auth-form-group">
+        <label>Password</label>
+        <input class="auth-input" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-btn" style="background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:none" onclick="doDemo()">🎮 Try Demo (no account needed)</button>
+      <div class="auth-link" onclick="switchTab('signup')">Don't have an account? Create one →</div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signupForm" class="auth-form" style="display:none">
+      <div class="auth-form-group">
+        <label>Full name</label>
+        <input class="auth-input" type="text" id="signupName" placeholder="Jane Smith">
+      </div>
+      <div class="auth-form-group">
+        <label>Email address</label>
+        <input class="auth-input" type="email" id="signupEmail" placeholder="jane@example.com">
+      </div>
+      <div class="auth-form-group">
+        <label>I'm primarily a…</label>
+        <select class="auth-input" id="signupRole">
+          <option value="">Select your freelance type</option>
+          <option value="designer">Designer / Creative</option>
+          <option value="developer">Developer / Engineer</option>
+          <option value="writer">Writer / Content Creator</option>
+          <option value="consultant">Consultant / Strategist</option>
+          <option value="marketer">Marketer / Growth</option>
+          <option value="videographer">Videographer / Editor</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="auth-form-group">
+        <label>Password</label>
+        <input class="auth-input" type="password" id="signupPass" placeholder="Min. 6 characters">
+      </div>
+      <div class="auth-form-group">
+        <label>Confirm password</label>
+        <input class="auth-input" type="password" id="signupPass2" placeholder="Repeat password">
+      </div>
+      <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+      <div class="auth-link" onclick="switchTab('login')">Already have an account? Sign in →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: WELCOME
+══════════════════════════════════════ -->
+<div id="welcomeScreen" class="screen">
+  <div style="position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+    <div class="welcome-logo">🎉</div>
+    <div class="welcome-hi">Welcome, <span id="welcomeName">there</span>!</div>
+    <div class="welcome-sub">Your FreelanceIQ workspace is ready. What would you like to do first?</div>
+    <div class="welcome-cards">
+      <div class="welcome-card featured" onclick="startFresh()">
+        <div class="wc-icon">🚀</div>
+        <div class="wc-title">Start a New Project</div>
+        <div class="wc-desc">Enter project details and build your scope from scratch</div>
+      </div>
+      <div class="welcome-card" onclick="loadDemo()">
+        <div class="wc-icon">🎮</div>
+        <div class="wc-title">Explore Demo</div>
+        <div class="wc-desc">See FreelanceIQ in action with a pre-filled example project</div>
+      </div>
+      <div class="welcome-card" onclick="goToApp('benchmarking')">
+        <div class="wc-icon">📈</div>
+        <div class="wc-title">Check My Rate</div>
+        <div class="wc-desc">See how your hourly rate compares to the market right now</div>
+      </div>
+    </div>
+    <div class="welcome-skip" onclick="goToApp('dashboard')">Skip to dashboard →</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: APP
+══════════════════════════════════════ -->
+<div id="appScreen" class="screen">
+
+  <!-- SIDEBAR (desktop only) -->
+  <aside class="app-sidebar">
+    <div class="sb-logo">
+      <span style="font-size:1.2rem">⚡</span>
+      <span class="sb-logo-text">FreelanceIQ</span>
+      <span class="sb-badge">v4</span>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">J</div>
+      <div><div class="sb-user-name" id="sbName">Jane</div><div class="sb-user-role" id="sbRole">Freelancer</div></div>
+    </div>
+    <div class="sb-project">
+      <div class="sb-project-lbl">Active Project</div>
+      <div class="sb-project-name" id="sbProject">Untitled Project</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-group-lbl">Workspace</div>
+      <div class="nav-item active" onclick="showPanel('dashboard')"><span class="nav-icon">🏠</span>Dashboard<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('setup')"><span class="nav-icon">📋</span>Project Setup<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('scope')"><span class="nav-icon">🗂️</span>Scope Builder<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('expertise')"><span class="nav-icon">🎯</span>Expertise &amp; Rates<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('risk')"><span class="nav-icon">⚠️</span>Risk &amp; Buffer<span class="nav-dot"></span></div>
+      <div class="nav-group-lbl">Results</div>
+      <div class="nav-item" onclick="showPanel('report')"><span class="nav-icon">📊</span>Pricing Report<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('platforms')"><span class="nav-icon">🌐</span>Platform Compare<span class="nav-dot"></span></div>
+      <div class="nav-group-lbl">Tools</div>
+      <div class="nav-item" onclick="showPanel('timeline')"><span class="nav-icon">📅</span>Timeline Planner<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('benchmarking')"><span class="nav-icon">📈</span>Rate Benchmarking<span class="nav-dot"></span></div>
+      <div class="nav-item" onclick="showPanel('proposal')"><span class="nav-icon">📄</span>Proposal Generator<span class="nav-dot"></span></div>
+    </nav>
+    <div class="sb-stats">
+      <div class="sb-stat"><div class="sb-stat-val" id="sbHours">0h</div><div class="sb-stat-lbl">Scope Hours</div></div>
+      <div class="sb-stat"><div class="sb-stat-val" id="sbItems">0</div><div class="sb-stat-lbl">Deliverables</div></div>
+      <div class="sb-stat full"><div class="sb-stat-val" id="sbRange">$0 – $0</div><div class="sb-stat-lbl">Price Range</div></div>
+    </div>
+    <div class="sb-logout"><button onclick="doLogout()">← Sign Out</button></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="app-main">
+    <!-- Top bar -->
+    <div class="app-topbar">
+      <div class="topbar-left">
+        <div class="topbar-logo" style="display:none" id="mobileLogo">⚡ FreelanceIQ</div>
+        <div>
+          <div class="topbar-title" id="topTitle">Dashboard</div>
+          <div class="topbar-sub" id="topSub">Overview</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="btnDesktop" onclick="setMode('desktop')">🖥 Desktop</button>
+          <button class="mode-btn" id="btnMobile" onclick="setMode('mobile')">📱 Mobile</button>
+        </div>
+        <button class="btn-warn btn-sm" onclick="showResetModal()" title="Clear all project data">↺ Reset</button>
+        <button class="btn-ghost btn-sm" onclick="loadDemo()">🎮 Demo</button>
+        <button class="btn-primary btn-sm" onclick="generateReport()">⚡ Generate</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="dash-welcome">
+          <h1>Good to see you, <span id="dashName">there</span> 👋</h1>
+          <div style="color:var(--muted2);font-size:.875rem">Here's your project at a glance.</div>
+        </div>
+        <div class="dash-stats">
+          <div class="ds-card"><div class="ds-val" id="dItems">0</div><div class="ds-lbl">Scope Items</div></div>
+          <div class="ds-card"><div class="ds-val" id="dHours">0h</div><div class="ds-lbl">Total Hours</div></div>
+          <div class="ds-card"><div class="ds-val" id="dPrice">$0</div><div class="ds-lbl">Standard Price</div></div>
+          <div class="ds-card"><div class="ds-val" id="dRisk">0%</div><div class="ds-lbl">Risk Buffer</div></div>
+          <div class="ds-card"><div class="ds-val" id="dConf">–</div><div class="ds-lbl">Confidence</div></div>
+        </div>
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.75rem;font-weight:700;">Quick Actions</div>
+        <div class="dash-qs">
+          <div class="qs-card featured" onclick="showPanel('setup')"><div class="qs-icon">📋</div><div class="qs-title">Project Setup</div><div class="qs-desc">Set project type, client, and region</div></div>
+          <div class="qs-card" onclick="showPanel('scope')"><div class="qs-icon">🗂️</div><div class="qs-title">Scope Builder</div><div class="qs-desc">Pick deliverables from a visual menu</div></div>
+          <div class="qs-card" onclick="showPanel('expertise')"><div class="qs-icon">🎯</div><div class="qs-title">Set Your Rate</div><div class="qs-desc">Skill level, urgency, and rate override</div></div>
+          <div class="qs-card" onclick="showPanel('report')"><div class="qs-icon">📊</div><div class="qs-title">Pricing Report</div><div class="qs-desc">3-tier pricing with charts &amp; clauses</div></div>
+          <div class="qs-card" onclick="showPanel('timeline')"><div class="qs-icon">📅</div><div class="qs-title">Timeline Planner</div><div class="qs-desc">Auto Gantt from your scope</div></div>
+          <div class="qs-card" onclick="showPanel('proposal')"><div class="qs-icon">📄</div><div class="qs-title">Proposal Generator</div><div class="qs-desc">Export a client-ready proposal</div></div>
+        </div>
+      </div>
+
+      <!-- ── PROJECT SETUP ── -->
+      <div class="panel" id="panel-setup">
+        <div class="section-title">Project Setup</div>
+        <div class="section-sub">These fields shape every calculation in the app.</div>
+        <div class="card">
+          <div class="form-grid">
+            <div class="form-group" style="grid-column:1/-1">
+              <label>Project Name *</label>
+              <input type="text" id="projectName" placeholder="e.g. Acme Corp — Website Redesign" oninput="S.projectName=this.value;updateStats()">
+            </div>
+            <div class="form-group"><label>Client Type</label>
+              <select id="clientType">
+                <option value="new">New Client</option><option value="returning">Returning Client</option>
+                <option value="agency">Agency Referral</option><option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Project Type</label>
+              <select id="projectType" onchange="S.projectType=this.value;updateStats()">
+                <option value="web-design">Web Design</option><option value="web-development">Web Development</option>
+                <option value="mobile-app">Mobile App</option><option value="branding">Branding &amp; Identity</option>
+                <option value="content-writing">Content Writing</option><option value="social-media">Social Media</option>
+                <option value="data-analysis">Data Analysis</option><option value="ml-ai">ML / AI</option>
+                <option value="consulting">Consulting</option><option value="video-production">Video Production</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Market Region</label>
+              <select id="region" onchange="S.region=this.value;updateStats()">
+                <option value="usa-tier1">USA — Major Cities</option>
+                <option value="usa-tier2" selected>USA — General</option>
+                <option value="canada">Canada</option><option value="uk">United Kingdom</option>
+                <option value="western-europe">Western Europe</option><option value="australia">Australia</option>
+                <option value="eastern-europe">Eastern Europe</option><option value="asia-pacific">Asia Pacific</option>
+                <option value="latin-america">Latin America</option><option value="middle-east">Middle East</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Currency</label>
+              <select id="currency" onchange="S.currency=this.value;updateStats()">
+                <option value="USD">USD ($)</option><option value="GBP">GBP (£)</option>
+                <option value="EUR">EUR (€)</option><option value="CAD">CAD (CA$)</option><option value="AUD">AUD (A$)</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1"><label>Project Description (optional)</label>
+              <textarea id="projectDesc" placeholder="Add context — shapes your proposal and contract clauses…" oninput="S.projectDesc=this.value"></textarea>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="saveSetup()">Save &amp; Continue to Scope →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCOPE BUILDER ── -->
+      <div class="panel" id="panel-scope">
+        <div class="section-title">Scope Builder</div>
+        <div class="section-sub">Browse by category, click tiles to select deliverables, then adjust hours and complexity below.</div>
+        <div class="card">
+          <div class="scope-layout">
+            <div class="scope-catnav" id="scopeCatNav"></div>
+            <div class="scope-items-area">
+              <div class="scope-items-hdr">
+                <h3 id="scopeCatTitle">All Deliverables</h3>
+                <button class="btn-ghost btn-sm" onclick="addCustom()">+ Custom</button>
+              </div>
+              <div class="scope-tiles" id="scopeTiles"></div>
+            </div>
+          </div>
+          <hr class="scope-divider">
+          <div class="scope-table-title">Selected — <span id="scopeCount">0 items</span></div>
+          <div id="scopeTableWrap"><div style="color:var(--muted2);font-size:.84rem;padding:.5rem 0">No items selected yet.</div></div>
+          <div class="btn-row" style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1.25rem;">
+            <button class="btn-primary" onclick="scopeContinue()">Continue to Expertise &amp; Rates →</button>
+            <button class="btn-ghost" onclick="showPanel('setup')">← Back to Setup</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EXPERTISE ── -->
+      <div class="panel" id="panel-expertise">
+        <div class="section-title">Expertise &amp; Rates</div>
+        <div class="section-sub">Your skill level and urgency multiply into every pricing calculation.</div>
+        <div class="card">
+          <div class="form-group" style="margin-bottom:1.15rem">
+            <label>Skill Level</label>
+            <div class="opt-grid">
+              <div class="opt-card" onclick="selSkill('beginner',this)"><div class="oc-icon">🌱</div><div class="oc-title">Beginner</div><div class="oc-sub">$20–40/hr</div></div>
+              <div class="opt-card" onclick="selSkill('intermediate',this)"><div class="oc-icon">⚡</div><div class="oc-title">Intermediate</div><div class="oc-sub">$40–80/hr</div></div>
+              <div class="opt-card selected" onclick="selSkill('advanced',this)"><div class="oc-icon">🔥</div><div class="oc-title">Advanced</div><div class="oc-sub">$80–130/hr</div></div>
+              <div class="opt-card" onclick="selSkill('expert',this)"><div class="oc-icon">💎</div><div class="oc-title">Expert</div><div class="oc-sub">$130–250/hr</div></div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:1.15rem">
+            <label>Deadline Urgency</label>
+            <div class="opt-grid">
+              <div class="opt-card selected" onclick="selUrgency('flexible',this)"><div class="oc-icon">🏖️</div><div class="oc-title">Flexible</div><div class="oc-sub">No rush</div></div>
+              <div class="opt-card" onclick="selUrgency('normal',this)"><div class="oc-icon">📅</div><div class="oc-title">Normal</div><div class="oc-sub">+10%</div></div>
+              <div class="opt-card" onclick="selUrgency('tight',this)"><div class="oc-icon">⏰</div><div class="oc-title">Tight</div><div class="oc-sub">+25%</div></div>
+              <div class="opt-card" onclick="selUrgency('rush',this)"><div class="oc-icon">🚨</div><div class="oc-title">Rush</div><div class="oc-sub">+50%</div></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Custom Rate Override ($/hr) — optional</label>
+            <input type="number" id="rateOverride" placeholder="Leave blank to use skill-level defaults" style="max-width:300px" oninput="updateStats()">
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="saveExpertise()">Save &amp; Continue to Risk →</button>
+            <button class="btn-ghost" onclick="showPanel('scope')">← Back to Scope</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RISK ── -->
+      <div class="panel" id="panel-risk">
+        <div class="section-title">Risk &amp; Buffer</div>
+        <div class="section-sub">Each selected factor adds a % buffer to your Standard and Premium tiers.</div>
+        <div class="card">
+          <div class="risk-grid" id="riskGrid"></div>
+          <div id="riskSummary" style="display:none" class="warn-box"></div>
+          <div class="btn-row">
+            <button class="btn-primary" onclick="generateReport()">⚡ Generate Pricing Report</button>
+            <button class="btn-ghost" onclick="showPanel('expertise')">← Back to Expertise</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REPORT ── -->
+      <div class="panel" id="panel-report">
+        <div class="section-title">Pricing Report</div>
+        <div class="section-sub" id="reportMeta">Complete setup and scope, then click Generate.</div>
+        <div id="reportEmpty" class="warn-box">No report yet — fill in Project Setup + Scope Builder, then click <strong>⚡ Generate</strong>.</div>
+        <div id="reportContent" style="display:none">
+          <div class="tiers-grid" id="tiersGrid"></div>
+
+          <!-- How We Got Here -->
+          <div class="price-calc-box" id="pricingBreakdown"></div>
+
+          <div class="bk-grid" id="bkGrid"></div>
+          <div class="charts-row">
+            <div class="chart-box"><h4>Scope Distribution</h4><div class="chart-canvas"><canvas id="scopeChart"></canvas></div></div>
+            <div class="chart-box"><h4>Pricing Tiers</h4><div class="chart-canvas"><canvas id="tiersChart"></canvas></div></div>
+          </div>
+          <div style="margin-top:1rem;font-size:.9rem;font-weight:700;color:var(--rose);margin-bottom:.65rem">Deliverable Breakdown</div>
+          <div class="tbl-wrap"><table><thead><tr><th>Deliverable</th><th>Category</th><th>Complexity</th><th>Hours</th><th>Cost</th></tr></thead><tbody id="reportTbody"></tbody></table></div>
+
+          <div class="gauge-wrap">
+            <h4>Market Position</h4>
+            <div style="position:relative">
+              <div class="gauge-bar" id="gaugeBar">
+                <div class="gauge-needle" id="gaugeNeedle"></div>
+              </div>
+              <div id="gaugeDots"></div>
+            </div>
+            <div class="gauge-labels"><span>Below Market</span><span>Market Rate</span><span>Premium</span></div>
+            <div style="margin-top:.65rem;font-size:.84rem;color:var(--muted2)" id="gaugeInsight"></div>
+            <div id="gaugeLegend" style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.85rem;font-size:.72rem;"></div>
+          </div>
+
+          <div style="margin-top:1rem;font-size:.9rem;font-weight:700;color:var(--rose);margin-bottom:.65rem">Risk Buffer Breakdown</div>
+          <div class="card" id="riskBufList"></div>
+          <div style="margin-top:1rem;font-size:.9rem;font-weight:700;color:var(--rose);margin-bottom:.65rem">Contract Clauses</div>
+          <div class="clauses-list" id="clausesList"></div>
+          <div class="collapsible" style="margin-top:.85rem">
+            <div class="coll-hdr" onclick="toggleColl(this)">💰 Tax &amp; Take-Home <span>▼</span></div>
+            <div class="coll-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Country</label>
+                  <select id="taxCountry" onchange="calcTax()"><option value="usa">USA</option><option value="uk">UK</option><option value="canada">Canada</option><option value="australia">Australia</option><option value="other">Other</option></select>
+                </div>
+                <div class="form-group" id="filingGrp"><label>Filing Status</label>
+                  <select id="filingStatus" onchange="calcTax()"><option value="single">Single</option><option value="married">Married Jointly</option></select>
+                </div>
+                <div class="form-group" style="justify-content:flex-end"><label>&nbsp;</label><button class="btn-primary" onclick="calcTax()">Calculate</button></div>
+              </div>
+              <div id="taxResult"></div>
+            </div>
+          </div>
+          <div class="collapsible">
+            <div class="coll-hdr" onclick="toggleColl(this)">📋 Change Order Calculator <span>▼</span></div>
+            <div class="coll-body">
+              <div class="form-grid">
+                <div class="form-group"><label>Extra Hours</label><input type="number" id="changeHours" value="10" min="1"></div>
+                <div class="form-group" style="justify-content:flex-end"><label>&nbsp;</label><button class="btn-primary" onclick="calcChangeOrder()">Calculate</button></div>
+              </div>
+              <div id="changeOrderResult"></div>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:1.25rem">
+            <button class="btn-primary" onclick="showPanel('proposal')">📄 Generate Proposal</button>
+            <button class="btn-secondary" onclick="window.print()">🖨️ Print / PDF</button>
+            <button class="btn-ghost" onclick="copyReport()">📤 Copy Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PLATFORMS ── -->
+      <div class="panel" id="panel-platforms">
+        <div class="section-title">Platform Compare</div>
+        <div class="section-sub">Your take-home across major platforms vs. going direct.</div>
+        <div id="platsEmpty" class="warn-box">Generate your Pricing Report first.</div>
+        <div id="platsContent" style="display:none">
+          <div class="platforms-grid" id="platformsGrid"></div>
+          <div class="info-box" id="platInsight"></div>
+        </div>
+      </div>
+
+      <!-- ── TIMELINE ── -->
+      <div class="panel" id="panel-timeline">
+        <div class="section-title">Timeline Planner</div>
+        <div class="section-sub">Gantt chart auto-built from your selected scope.</div>
+        <div class="card">
+          <div class="tl-controls">
+            <div class="form-group"><label>Start Date</label><input type="date" id="tlStart"></div>
+            <div class="form-group"><label>Hours / Week</label><input type="number" id="tlHpw" value="40" min="5" max="80" oninput="renderTimeline()"></div>
+            <div class="form-group"><label>Padding Buffer</label>
+              <select id="tlBuffer" onchange="renderTimeline()">
+                <option value="0">None</option><option value="0.1">10%</option>
+                <option value="0.2" selected>20%</option><option value="0.3">30%</option>
+              </select>
+            </div>
+          </div>
+          <div class="tl-summary" id="tlSummary"></div>
+          <div class="gantt-wrap" id="ganttWrap"><div class="warn-box">Add deliverables in Scope Builder first.</div></div>
+        </div>
+      </div>
+
+      <!-- ── BENCHMARKING ── -->
+      <div class="panel" id="panel-benchmarking">
+        <div class="section-title">Rate Benchmarking</div>
+        <div class="section-sub">See where your rate stands vs the market — and what a raise means for your income.</div>
+        <div class="bench-layout">
+          <div>
+            <div class="card">
+              <div style="font-size:.87rem;font-weight:700;margin-bottom:.85rem">Market Comparison</div>
+              <div class="form-grid" style="margin-bottom:.85rem">
+                <div class="form-group"><label>Skill Level</label>
+                  <select id="benchSkill" onchange="renderBench()">
+                    <option value="beginner">Beginner</option><option value="intermediate">Intermediate</option>
+                    <option value="advanced" selected>Advanced</option><option value="expert">Expert</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Region</label>
+                  <select id="benchRegion" onchange="renderBench()">
+                    <option value="usa-tier1">USA Major Cities</option><option value="usa-tier2" selected>USA General</option>
+                    <option value="canada">Canada</option><option value="uk">UK</option>
+                    <option value="western-europe">W. Europe</option><option value="australia">Australia</option>
+                    <option value="eastern-europe">E. Europe</option><option value="asia-pacific">Asia Pacific</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:1rem">
+                <label>Your Rate ($/hr)</label>
+                <input type="number" id="benchRate" value="100" oninput="renderBench()">
+              </div>
+              <div id="benchList"></div>
+            </div>
+            <div class="raise-calc">
+              <h4>💡 Rate Raise Calculator</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Hours / Week</label><input type="number" id="raiseHpw" value="30" oninput="renderRaise()"></div>
+                <div class="form-group"><label>Weeks / Year</label><input type="number" id="raiseWpy" value="46" oninput="renderRaise()"></div>
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label-row"><span>Rate increase</span><span class="val" id="raisePctLbl">+10%</span></div>
+                <input type="range" id="raiseSlider" min="5" max="100" step="5" value="10" oninput="renderRaise()">
+              </div>
+              <div class="raise-result" id="raiseResult"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:.87rem;font-weight:700;margin-bottom:.85rem">Rate Distribution Chart</div>
+            <div class="chart-canvas" style="height:260px"><canvas id="benchChart"></canvas></div>
+            <div style="margin-top:1rem" id="benchInsight"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROPOSAL ── -->
+      <div class="panel" id="panel-proposal">
+        <div class="section-title">Proposal Generator</div>
+        <div class="section-sub">Fill in the details — the live preview updates as you type.</div>
+        <div class="proposal-layout">
+          <div style="display:flex;flex-direction:column;gap:.85rem">
+            <div class="card">
+              <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.85rem;font-weight:700;">Your Details</div>
+              <div class="form-group"><label>Your Name / Studio</label><input type="text" id="pYourName" placeholder="Jane Smith" oninput="renderProposal()"></div>
+              <div class="form-group" style="margin-top:.75rem"><label>Your Email</label><input type="text" id="pYourEmail" placeholder="jane@studio.com" oninput="renderProposal()"></div>
+              <div class="form-group" style="margin-top:.75rem"><label>Website (optional)</label><input type="text" id="pYourWeb" placeholder="www.janestudio.com" oninput="renderProposal()"></div>
+            </div>
+            <div class="card">
+              <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.85rem;font-weight:700;">Client Details</div>
+              <div class="form-group"><label>Client / Company</label><input type="text" id="pClient" placeholder="Acme Corp" oninput="renderProposal()"></div>
+              <div class="form-group" style="margin-top:.75rem"><label>Contact Name</label><input type="text" id="pContact" placeholder="John Doe, Head of Product" oninput="renderProposal()"></div>
+            </div>
+            <div class="card">
+              <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.85rem;font-weight:700;">Terms</div>
+              <div class="form-grid">
+                <div class="form-group"><label>Deposit %</label><input type="number" id="pDeposit" value="50" oninput="renderProposal()"></div>
+                <div class="form-group"><label>Valid (days)</label><input type="number" id="pValid" value="30" oninput="renderProposal()"></div>
+                <div class="form-group"><label>Revisions Included</label><input type="number" id="pRevisions" value="3" oninput="renderProposal()"></div>
+                <div class="form-group"><label>Payment Terms</label>
+                  <select id="pPayTerms" onchange="renderProposal()">
+                    <option value="on-delivery">On Delivery</option><option value="net7">Net 7</option>
+                    <option value="net14">Net 14</option><option value="net30">Net 30</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:.5rem"><label>Additional Notes</label>
+                <textarea id="pNotes" placeholder="Any extras for the proposal…" oninput="renderProposal()"></textarea>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" onclick="copyProp()">📋 Copy Proposal</button>
+              <button class="btn-ghost" onclick="window.print()">🖨️ Print / PDF</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:.45rem">Live Preview</div>
+            <div class="proposal-preview" id="proposalPreview">Fill in your details on the left and generate a report to see the full proposal preview here.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav class="app-bottomnav">
+    <div class="bnav-item active" id="bn-dashboard" onclick="showPanel('dashboard');setBnav('dashboard')"><span class="bnav-icon">🏠</span>Home</div>
+    <div class="bnav-item" id="bn-scope" onclick="showPanel('scope');setBnav('scope')"><span class="bnav-icon">🗂️</span>Scope</div>
+    <div class="bnav-item" id="bn-report" onclick="showPanel('report');setBnav('report')"><span class="bnav-icon">📊</span>Report</div>
+    <div class="bnav-item" id="bn-timeline" onclick="showPanel('timeline');setBnav('timeline')"><span class="bnav-icon">📅</span>Timeline</div>
+    <div class="bnav-item" id="bn-more" onclick="showMobileMenu()"><span class="bnav-icon">⋯</span>More</div>
+  </nav>
+
+  <!-- Mobile "More" overlay -->
+  <div id="mobileMenu" style="display:none;position:absolute;inset:0;z-index:500;background:rgba(0,0,0,.7)" onclick="hideMobileMenu()">
+    <div style="position:absolute;bottom:var(--bottomnav-h);left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem" onclick="event.stopPropagation()">
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('setup');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">📋</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Setup</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('expertise');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">🎯</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Expertise</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('risk');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">⚠️</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Risk</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('platforms');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">🌐</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Platforms</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('benchmarking');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">📈</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Rates</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center" onclick="showPanel('proposal');hideMobileMenu();setBnav('')"><div style="font-size:1.3rem">📄</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem">Proposal</div></div>
+      <div class="qs-card" style="padding:.85rem;text-align:center;grid-column:1/-1" onclick="showResetModal();hideMobileMenu()"><div style="font-size:1.3rem">↺</div><div style="font-size:.75rem;font-weight:700;margin-top:.3rem;color:var(--yellow)">Reset Project</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ── CONSTANTS ──
+const BASE_RATES={beginner:{min:20,max:40,typical:28},intermediate:{min:40,max:80,typical:58},advanced:{min:80,max:130,typical:100},expert:{min:130,max:250,typical:175}};
+const REG_MULT={'usa-tier1':1.45,'usa-tier2':1.00,'canada':0.88,'uk':0.95,'western-europe':0.90,'australia':0.93,'eastern-europe':0.52,'asia-pacific':0.42,'latin-america':0.45,'middle-east':0.60};
+const PROJ_MULT={'web-design':1.00,'web-development':1.25,'mobile-app':1.30,'branding':0.95,'content-writing':0.75,'social-media':0.80,'data-analysis':1.30,'ml-ai':1.50,'consulting':1.20,'video-production':1.10,'other':1.00};
+const CPLX_MULT={simple:0.85,medium:1.00,complex:1.40};
+const CPLX_HRS={simple:4,medium:8,complex:16};
+const URG_MULT={flexible:1.00,normal:1.10,tight:1.25,rush:1.50};
+const CUR_SYM={USD:'$',GBP:'£',EUR:'€',CAD:'CA$',AUD:'A$'};
+
+const CATS={
+  design:{label:'Design/UI',icon:'🎨',hex:'#4A8CB5',mult:1.05,diff:'medium',items:['Homepage Design','Mobile Mockups','Design System','Prototype/Figma','Icon Set','Brand Guidelines','Style Guide','Email Templates','Landing Page Design','Component Library']},
+  dev:{label:'Development',icon:'💻',hex:'#C07D42',mult:1.30,diff:'hard',items:['Frontend Build','Backend API','Database Schema','Authentication','Admin Dashboard','Deployment/DevOps','3rd-party Integration','Performance Optimisation','CMS Setup','Webflow Build']},
+  content:{label:'Content/Copy',icon:'✍️',hex:'#5BAD76',mult:0.80,diff:'easy',items:['Landing Page Copy','Blog Posts (×5)','Email Sequence','Product Descriptions','SEO Research','Social Captions','Script Writing','Case Studies','About Page Copy','FAQ Content']},
+  strategy:{label:'Strategy',icon:'🧭',hex:'#CFA034',mult:1.10,diff:'medium',items:['Discovery Workshop','Competitive Analysis','Product Roadmap','User Research','Requirements Doc','Wireframes','Information Architecture','UX Audit','Brand Strategy','GTM Plan']},
+  qa:{label:'QA/Testing',icon:'🔬',hex:'#6AAFD8',mult:0.90,diff:'easy',items:['Test Plan','Automated Tests','Manual QA Pass','Bug Fix Bundle','Performance Audit','Accessibility Audit','Cross-browser Testing','Security Review']},
+  consulting:{label:'Consulting',icon:'💡',hex:'#C55555',mult:1.20,diff:'hard',items:['Technical Audit','Advisory Sessions (×3)','Code Review','Architecture Review','Tech Due Diligence','Training Workshop','Onboarding','Office Hours (monthly)']},
+  handoff:{label:'Handoff/Docs',icon:'📦',hex:'#9A8C7C',mult:0.75,diff:'easy',items:['Documentation','Training Session','Handoff Package','Video Walkthrough','Support (30 days)','Knowledge Base','Style Guide PDF','Source Export']}
+};
+
+const RISK_DATA={
+  'new-client':{label:'New client, no prior relationship',pct:.15},
+  'vague-req':{label:'Vague or unclear requirements',pct:.20},
+  'specialized':{label:'Requires specialised skills/tools',pct:.12},
+  'scope-creep':{label:'Client history of scope changes',pct:.25},
+  'intl-payment':{label:'International payment complexity',pct:.08},
+  'ip-complex':{label:'Complex IP/ownership requirements',pct:.10},
+  'multi-stake':{label:'Multiple stakeholders/decision-makers',pct:.15},
+  'no-contract':{label:'Client resistant to formal contract',pct:.30},
+  'tight-deadline':{label:'Very tight deadline',pct:.20},
+  'first-project':{label:'First time doing this project type',pct:.10}
+};
+
+const PLAT_DATA={
+  upwork:{emoji:'🔷',name:'Upwork',tagline:"World's largest marketplace",fee:.20,mult:{beginner:.65,intermediate:.80,advanced:.90,expert:.95},pros:['Payment protection','Steady client flow'],cons:['20% fee','Race-to-bottom'],bestFor:'Building early reviews'},
+  fiverr:{emoji:'💚',name:'Fiverr',tagline:'Package-based marketplace',fee:.20,mult:{beginner:.55,intermediate:.70,advanced:.80,expert:.85},pros:['Easy packages','Inbound leads'],cons:['20% always','Algorithm-dependent'],bestFor:'Productized services'},
+  toptal:{emoji:'⭐',name:'Toptal',tagline:'Top 3% of global talent',fee:.15,mult:{beginner:.85,intermediate:.95,advanced:1.10,expert:1.20},pros:['Premium clients','Higher rates'],cons:['3% acceptance','Long vetting'],bestFor:'Senior experts'},
+  freelancerCom:{emoji:'🌐',name:'Freelancer.com',tagline:'Global bid marketplace',fee:.10,mult:{beginner:.50,intermediate:.65,advanced:.75,expert:.82},pros:['Low 10% fee','Huge variety'],cons:['Competitive bidding','Low budgets'],bestFor:'Volume/intl clients'}
+};
+
+// Market rate reference points for gauge (as % of "market rate" = 1.0)
+const GAUGE_REFS=[
+  {label:'Fiverr avg',pct:18,color:'#5BAD76'},
+  {label:'Upwork avg',pct:35,color:'#4A8CB5'},
+  {label:'Market median',pct:55,color:'#CFA034'},
+  {label:'Toptal avg',pct:78,color:'#C07D42'},
+];
+
+// ── STATE ──
+const S={
+  user:null, projectName:'', clientType:'new', projectType:'web-development',
+  region:'usa-tier2', currency:'USD', projectDesc:'',
+  scope:[], skillLevel:'advanced', urgency:'flexible',
+  risks:['new-client'], results:null, activeCat:'all'
+};
+let scopeChartInst=null,tiersChartInst=null,benchChartInst=null;
+
+// ── UTILS ──
+function fmt(n){return Math.round(n).toLocaleString('en-US');}
+function fmtC(n){return(CUR_SYM[S.currency]||'$')+fmt(n);}
+function showToast(msg,type='green'){
+  const t=document.createElement('div');t.className='toast';
+  t.style.background=type==='red'?'var(--red)':type==='yellow'?'var(--yellow)':'var(--green)';
+  t.style.color=type==='yellow'?'#000':'#fff';
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3100);
+}
+function toggleColl(h){const b=h.nextElementSibling;b.classList.toggle('open');h.querySelector('span:last-child').textContent=b.classList.contains('open')?'▲':'▼';}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('Copied!'));}
+
+// ── SCREENS ──
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ── AUTH ──
+function switchTab(tab){
+  document.getElementById('loginForm').style.display=tab==='login'?'flex':'none';
+  document.getElementById('signupForm').style.display=tab==='signup'?'flex':'none';
+  document.getElementById('tabLogin').classList.toggle('active',tab==='login');
+  document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
+  document.getElementById('authTitle').textContent=tab==='login'?'Welcome back':'Create your account';
+  document.getElementById('authSub').textContent=tab==='login'?'Sign in to FreelanceIQ':"It's free — takes 30 seconds";
+  document.getElementById('authError').classList.remove('show');
+}
+function showAuthError(msg){const e=document.getElementById('authError');e.textContent=msg;e.classList.add('show');}
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email){showAuthError('Please enter your email.');return;}
+  if(!pass){showAuthError('Please enter your password.');return;}
+  const name=email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  S.user={name,email,role:'Freelancer'};
+  afterLogin();
+}
+function doSignup(){
+  const name=document.getElementById('signupName').value.trim();
+  const email=document.getElementById('signupEmail').value.trim();
+  const role=document.getElementById('signupRole').value;
+  const pass=document.getElementById('signupPass').value;
+  const pass2=document.getElementById('signupPass2').value;
+  if(!name){showAuthError('Please enter your name.');return;}
+  if(!email||!email.includes('@')){showAuthError('Please enter a valid email.');return;}
+  if(!role){showAuthError('Please select your freelance type.');return;}
+  if(pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
+  if(pass!==pass2){showAuthError('Passwords do not match.');return;}
+  S.user={name,email,role:role.charAt(0).toUpperCase()+role.slice(1)};
+  afterLogin();
+}
+function doDemo(){
+  S.user={name:'Demo User',email:'demo@freelanceiq.com',role:'Designer'};
+  afterLogin(true);
+}
+function afterLogin(demo=false){
+  document.getElementById('welcomeName').textContent=S.user.name.split(' ')[0];
+  showScreen('welcomeScreen');
+  if(demo)setTimeout(()=>loadDemo(),300);
+}
+function doLogout(){
+  S.user=null;S.scope=[];S.results=null;S.projectName='';
+  showScreen('authScreen');switchTab('login');
+}
+
+// ── RESET ──
+function showResetModal(){document.getElementById('resetModal').classList.add('show');}
+function confirmReset(){
+  document.getElementById('resetModal').classList.remove('show');
+  // Clear project state
+  S.projectName='';S.clientType='new';S.projectType='web-development';
+  S.region='usa-tier2';S.currency='USD';S.projectDesc='';
+  S.scope=[];S.skillLevel='advanced';S.urgency='flexible';
+  S.risks=['new-client'];S.results=null;S.activeCat='all';
+  // Reset form fields
+  const el=id=>document.getElementById(id);
+  if(el('projectName'))el('projectName').value='';
+  if(el('projectDesc'))el('projectDesc').value='';
+  if(el('projectType'))el('projectType').value='web-development';
+  if(el('region'))el('region').value='usa-tier2';
+  if(el('currency'))el('currency').value='USD';
+  if(el('rateOverride'))el('rateOverride').value='';
+  // Reset skill/urgency selections
+  document.querySelectorAll('[onclick*="selSkill"]').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('[onclick*="selUrgency"]').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('[onclick*="selSkill(\'advanced\'"]')?.classList.add('selected');
+  document.querySelector('[onclick*="selUrgency(\'flexible\'"]')?.classList.add('selected');
+  // Reset report UI
+  if(el('reportEmpty'))el('reportEmpty').style.display='block';
+  if(el('reportContent'))el('reportContent').style.display='none';
+  if(el('platsEmpty'))el('platsEmpty').style.display='block';
+  if(el('platsContent'))el('platsContent').style.display='none';
+  updateStats();
+  showPanel('setup');
+  showToast('Project reset — start fresh!');
+}
+
+// ── WELCOME ──
+function startFresh(){goToApp('setup');}
+function loadDemo(){
+  S.projectName='Acme Corp — SaaS Redesign';S.clientType='new';S.projectType='web-development';
+  S.region='usa-tier2';S.currency='USD';
+  S.projectDesc='Full redesign: design system, Figma prototypes, Webflow build, CMS, 30-day support.';
+  S.scope=[
+    {id:'d1',name:'Prototype/Figma',category:'design',complexity:'complex',hours:20},
+    {id:'d2',name:'Homepage Design',category:'design',complexity:'complex',hours:12},
+    {id:'d3',name:'Frontend Build',category:'dev',complexity:'complex',hours:30},
+    {id:'d4',name:'CMS Setup',category:'dev',complexity:'medium',hours:10},
+    {id:'d5',name:'Mobile Mockups',category:'design',complexity:'medium',hours:8},
+    {id:'d6',name:'Landing Page Copy',category:'content',complexity:'medium',hours:6},
+    {id:'d7',name:'Documentation',category:'handoff',complexity:'simple',hours:4},
+    {id:'d8',name:'Performance Audit',category:'qa',complexity:'medium',hours:6}
+  ];
+  S.skillLevel='advanced';S.urgency='normal';S.risks=['new-client','vague-req','scope-creep'];
+  const el=id=>document.getElementById(id);
+  if(el('projectName'))el('projectName').value=S.projectName;
+  if(el('projectType'))el('projectType').value='web-development';
+  if(el('region'))el('region').value='usa-tier2';
+  if(el('projectDesc'))el('projectDesc').value=S.projectDesc;
+  document.querySelectorAll('[onclick*="selSkill"]').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('[onclick*="selUrgency"]').forEach(c=>c.classList.remove('selected'));
+  document.querySelector(`[onclick="selSkill('advanced',this)"]`)?.classList.add('selected');
+  document.querySelector(`[onclick="selUrgency('normal',this)"]`)?.classList.add('selected');
+  updateStats();
+  goToApp('dashboard');
+}
+function goToApp(panel){
+  if(S.user){
+    document.getElementById('sbName').textContent=S.user.name;
+    document.getElementById('sbRole').textContent=S.user.role||'Freelancer';
+    document.getElementById('sbAvatar').textContent=S.user.name.charAt(0).toUpperCase();
+    document.getElementById('dashName').textContent=S.user.name.split(' ')[0];
+    const today=new Date().toISOString().split('T')[0];
+    if(document.getElementById('tlStart'))document.getElementById('tlStart').value=today;
+  }
+  showScreen('appScreen');
+  renderRiskGrid();
+  showPanel(panel||'dashboard');
+  updateStats();
+}
+
+// ── MODE ──
+function setMode(mode){
+  document.body.className=`mode-${mode}`;
+  document.getElementById('btnDesktop').classList.toggle('active',mode==='desktop');
+  document.getElementById('btnMobile').classList.toggle('active',mode==='mobile');
+  document.getElementById('mobileLogo').style.display=mode==='mobile'?'block':'none';
+}
+
+// ── BOTTOM NAV ──
+function setBnav(id){
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  if(id)document.getElementById('bn-'+id)?.classList.add('active');
+}
+function showMobileMenu(){document.getElementById('mobileMenu').style.display='block';}
+function hideMobileMenu(){document.getElementById('mobileMenu').style.display='none';}
+
+// ── NAV ──
+const PANEL_META={
+  dashboard:{title:'Dashboard',sub:'Your project at a glance'},
+  setup:{title:'Project Setup',sub:'Define project fundamentals'},
+  scope:{title:'Scope Builder',sub:'Build your deliverables list'},
+  expertise:{title:'Expertise & Rates',sub:'Set skill level and urgency'},
+  risk:{title:'Risk & Buffer',sub:'Price in your risk factors'},
+  report:{title:'Pricing Report',sub:'AI-generated 3-tier analysis'},
+  platforms:{title:'Platform Compare',sub:'Take-home across marketplaces'},
+  timeline:{title:'Timeline Planner',sub:'Gantt chart from your scope'},
+  benchmarking:{title:'Rate Benchmarking',sub:'Your rate vs the market'},
+  proposal:{title:'Proposal Generator',sub:'Ready-to-send client proposal'}
+};
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`showPanel('${id}')`)n.classList.add('active');});
+  const m=PANEL_META[id]||{title:id,sub:''};
+  document.getElementById('topTitle').textContent=m.title;
+  document.getElementById('topSub').textContent=m.sub;
+  if(id==='scope')renderScope();
+  if(id==='risk')renderRiskGrid();
+  if(id==='timeline')renderTimeline();
+  if(id==='benchmarking')renderBench();
+  if(id==='proposal')renderProposal();
+  if(id==='platforms'&&S.results)renderPlatforms();
+}
+
+// ── STATS ──
+function updateStats(){
+  const hrs=S.scope.reduce((a,d)=>a+d.hours,0);
+  const items=S.scope.length;
+  document.getElementById('sbHours').textContent=fmt(hrs)+'h';
+  document.getElementById('sbItems').textContent=items;
+  document.getElementById('sbProject').textContent=S.projectName||'Untitled Project';
+  if(items>0){
+    const p=calcPricing();
+    document.getElementById('sbRange').textContent=fmtC(p.budgetTotal)+' – '+fmtC(p.premiumTotal);
+    document.getElementById('dItems').textContent=items;
+    document.getElementById('dHours').textContent=fmt(hrs)+'h';
+    document.getElementById('dPrice').textContent=fmtC(p.standardTotal);
+    document.getElementById('dRisk').textContent=fmt(p.totalRiskPct*100)+'%';
+    document.getElementById('dConf').textContent=p.confidence+'%';
+  } else {
+    document.getElementById('sbRange').textContent='$0 – $0';
+    document.getElementById('dPrice').textContent='$0';
+    document.getElementById('dRisk').textContent='0%';
+    document.getElementById('dConf').textContent='–';
+  }
+}
+
+// ── SETUP ──
+function saveSetup(){
+  const name=document.getElementById('projectName').value.trim();
+  if(!name){showToast('Please enter a project name','red');return;}
+  S.projectName=name;S.clientType=document.getElementById('clientType').value;
+  S.projectType=document.getElementById('projectType').value;S.region=document.getElementById('region').value;
+  S.currency=document.getElementById('currency').value;S.projectDesc=document.getElementById('projectDesc').value;
+  updateStats();showToast('Project saved!');showPanel('scope');
+}
+
+// ── EXPERTISE ──
+function saveExpertise(){
+  updateStats();
+  showToast('Expertise saved!');
+  showPanel('risk');
+}
+function selSkill(l,el){S.skillLevel=l;document.querySelectorAll('[onclick*="selSkill"]').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');updateStats();}
+function selUrgency(l,el){S.urgency=l;document.querySelectorAll('[onclick*="selUrgency"]').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');updateStats();}
+
+// ── SCOPE ──
+function scopeContinue(){
+  if(!S.scope.length){showToast('Select at least one deliverable first','yellow');return;}
+  showPanel('expertise');
+}
+function renderScope(){renderCatNav();renderTiles();renderScopeTable();}
+function renderCatNav(){
+  const nav=document.getElementById('scopeCatNav');nav.innerHTML='';
+  const all=document.createElement('button');
+  all.className='scope-cat-btn'+(S.activeCat==='all'?' active':'');
+  all.innerHTML=`<span>📋</span> All <span class="cat-count">${Object.values(CATS).reduce((a,c)=>a+c.items.length,0)}</span>`;
+  all.onclick=()=>{S.activeCat='all';renderScope();};nav.appendChild(all);
+  Object.entries(CATS).forEach(([k,c])=>{
+    const btn=document.createElement('button');
+    btn.className='scope-cat-btn'+(S.activeCat===k?' active':'');
+    const sel=S.scope.filter(d=>d.category===k).length;
+    btn.innerHTML=`<span>${c.icon}</span> ${c.label} <span class="cat-count">${sel||c.items.length}</span>`;
+    btn.onclick=()=>{S.activeCat=k;renderScope();};nav.appendChild(btn);
+  });
+}
+
+function diffSegHTML(diff){
+  // Returns 3-segment mini progress bar
+  const segs=[1,2,3].map(n=>{
+    let cls='st-diff-seg';
+    if(diff==='easy'&&n===1)cls+=' on-easy';
+    else if(diff==='medium'&&n<=2)cls+=' on-medium';
+    else if(diff==='hard')cls+=' on-hard';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+  const label=diff==='easy'?'Easy':diff==='medium'?'Medium':'Hard';
+  return `<div class="st-diff"><span class="st-diff-label">${label}</span><div class="st-diff-bar">${segs}</div></div>`;
+}
+
+function renderTiles(){
+  const grid=document.getElementById('scopeTiles');grid.innerHTML='';
+  const title=document.getElementById('scopeCatTitle');
+  let items=[];
+  if(S.activeCat==='all'){
+    title.textContent='All Deliverables';
+    Object.entries(CATS).forEach(([k,c])=>c.items.forEach(n=>items.push({name:n,cat:k})));
+  } else {
+    const c=CATS[S.activeCat];
+    title.textContent=c.icon+' '+c.label;
+    c.items.forEach(n=>items.push({name:n,cat:S.activeCat}));
+  }
+  items.forEach(({name,cat})=>{
+    const sel=S.scope.find(d=>d.name===name&&d.category===cat);
+    const c=CATS[cat];
+    const tile=document.createElement('div');
+    tile.className='scope-tile'+(sel?' selected':'');
+    tile.innerHTML=`<div class="st-check">${sel?'✓':''}</div>
+      <div class="st-name">${name}</div>
+      <div class="st-meta">${c.icon} ${c.label}</div>
+      ${diffSegHTML(c.diff)}`;
+    tile.onclick=()=>toggleTile(name,cat,tile);
+    grid.appendChild(tile);
+  });
+}
+
+function toggleTile(name,cat,tile){
+  const idx=S.scope.findIndex(d=>d.name===name&&d.category===cat);
+  if(idx>=0){S.scope.splice(idx,1);tile.classList.remove('selected');tile.querySelector('.st-check').textContent='';}
+  else{S.scope.push({id:Date.now()+'',name,category:cat,complexity:'medium',hours:CPLX_HRS.medium});}
+  const found=S.scope.find(d=>d.name===name&&d.category===cat);
+  if(found){tile.classList.add('selected');tile.querySelector('.st-check').textContent='✓';}
+  renderCatNav();renderScopeTable();updateStats();
+}
+function addCustom(){
+  const name=prompt('Deliverable name:');if(!name?.trim())return;
+  const cat=S.activeCat==='all'?'dev':S.activeCat;
+  S.scope.push({id:Date.now()+'c',name:name.trim(),category:cat,complexity:'medium',hours:8,custom:true});
+  renderScope();updateStats();showToast('Custom item added!');
+}
+function setScopeCplx(i,c){S.scope[i].complexity=c;S.scope[i].hours=CPLX_HRS[c];renderScopeTable();updateStats();}
+function setScopeHrs(i,v){S.scope[i].hours=Math.max(1,parseInt(v)||1);updateStats();}
+function removeScope(i){S.scope.splice(i,1);renderScope();updateStats();}
+
+function itemCost(d){
+  const base=BASE_RATES[S.skillLevel];
+  const ov=parseFloat(document.getElementById('rateOverride')?.value)||0;
+  const rate=(ov||base.typical)*(REG_MULT[S.region]||1)*(PROJ_MULT[S.projectType]||1)*(CATS[d.category]?.mult||1)*CPLX_MULT[d.complexity]*URG_MULT[S.urgency];
+  return rate*d.hours;
+}
+function renderScopeTable(){
+  const wrap=document.getElementById('scopeTableWrap');
+  document.getElementById('scopeCount').textContent=S.scope.length+' item'+(S.scope.length!==1?'s':'');
+  if(!S.scope.length){wrap.innerHTML='<div style="color:var(--muted2);font-size:.84rem;padding:.5rem 0">No items selected yet.</div>';return;}
+  const totalHrs=S.scope.reduce((a,d)=>a+d.hours,0);
+  const baseCost=S.scope.reduce((a,d)=>a+itemCost(d),0);
+  const rows=S.scope.map((d,i)=>{
+    const c=CATS[d.category]||{icon:'📦',label:d.category};
+    return `<tr><td><strong>${d.name}</strong>${d.custom?' <span style="font-size:.68rem;color:var(--muted2)">(custom)</span>':''}</td>
+      <td>${c.icon} ${c.label}</td>
+      <td><div class="complexity-mini">
+        <button class="cplx-btn ${d.complexity==='simple'?'sel-s':''}" onclick="setScopeCplx(${i},'simple')">S</button>
+        <button class="cplx-btn ${d.complexity==='medium'?'sel-m':''}" onclick="setScopeCplx(${i},'medium')">M</button>
+        <button class="cplx-btn ${d.complexity==='complex'?'sel-c':''}" onclick="setScopeCplx(${i},'complex')">C</button>
+      </div></td>
+      <td><input type="number" value="${d.hours}" min="1" max="500" onchange="setScopeHrs(${i},this.value)"
+        style="width:55px;padding:.28rem .4rem;font-size:.78rem;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text)"></td>
+      <td style="font-weight:700;color:var(--green)">${fmtC(itemCost(d))}</td>
+      <td><button class="btn-danger" onclick="removeScope(${i})">×</button></td></tr>`;
+  }).join('');
+  wrap.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>Deliverable</th><th>Category</th><th>Complexity</th><th>Hours</th><th>Est. Cost</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr class="tbl-total"><td colspan="3">TOTAL</td><td>${fmt(totalHrs)}h</td><td colspan="2">${fmtC(baseCost)}</td></tr></tfoot>
+  </table></div>
+  <div class="info-box" style="margin-top:.75rem;font-size:.78rem">
+    💡 <strong>Scope subtotal is before risk buffer.</strong> Your final Standard price will include your selected risk adjustments — visible after you generate the full report.
+  </div>`;
+}
+
+// ── RISK ──
+function renderRiskGrid(){
+  document.getElementById('riskGrid').innerHTML=Object.entries(RISK_DATA).map(([k,r])=>`
+    <label class="risk-card ${S.risks.includes(k)?'checked':''}" id="rc-${k}">
+      <input type="checkbox" ${S.risks.includes(k)?'checked':''} onchange="toggleRisk(this,'${k}')">
+      <div><div class="risk-title">${r.label}</div><div class="risk-impact">+${fmt(r.pct*100)}%</div></div>
+    </label>`).join('');
+  updateRiskSummary();
+}
+function toggleRisk(cb,k){
+  document.getElementById('rc-'+k).classList.toggle('checked',cb.checked);
+  S.risks=Array.from(document.querySelectorAll('#riskGrid input:checked')).map(c=>c.closest('.risk-card').id.replace('rc-',''));
+  updateRiskSummary();updateStats();
+}
+function updateRiskSummary(){
+  const total=Math.min(.80,S.risks.reduce((a,k)=>a+(RISK_DATA[k]?.pct||0),0));
+  const box=document.getElementById('riskSummary');
+  if(S.risks.length){box.style.display='block';box.textContent=`Total risk buffer: +${fmt(total*100)}% applied to Standard & Premium pricing.`;}
+  else box.style.display='none';
+}
+
+// ── PRICING ENGINE ──
+function calcPricing(){
+  const base=BASE_RATES[S.skillLevel];
+  const reg=REG_MULT[S.region]||1;
+  const proj=PROJ_MULT[S.projectType]||1;
+  const ov=parseFloat(document.getElementById('rateOverride')?.value)||0;
+  const rMin=(ov||base.min)*reg*proj;
+  const rTyp=(ov||base.typical)*reg*proj;
+  const rMax=(ov||base.max)*reg*proj;
+  const urg=URG_MULT[S.urgency];
+  const risk=Math.min(.80,S.risks.reduce((a,k)=>a+(RISK_DATA[k]?.pct||0),0));
+  const totalHrs=S.scope.reduce((a,d)=>a+d.hours,0)||0;
+  // Each deliverable cost uses rTyp * category mult * complexity * urgency
+  const delivs=S.scope.map(d=>{
+    const c=CATS[d.category];
+    const rate=rTyp*(c?.mult||1)*CPLX_MULT[d.complexity]*urg;
+    return{...d,cost:rate*d.hours};
+  });
+  const baseCost=delivs.reduce((a,d)=>a+d.cost,0)||(rTyp*totalHrs*urg);
+  const urgAmt=baseCost*(urg-1);     // already baked into baseCost; shown separately in UI
+  const riskAmt=baseCost*risk;
+  return{
+    rMin,rTyp,rMax,urg,
+    baseCostNoUrg: baseCost/urg,     // scope cost before urgency
+    baseCost,                         // scope cost with urgency
+    urgAmt, risk, riskAmt,
+    budgetTotal:baseCost*.75,
+    standardTotal:baseCost*(1+risk),
+    premiumTotal:baseCost*(1+risk)*1.25,
+    totalRiskPct:risk,
+    totalHours:totalHrs,
+    deliverables:delivs,
+    confidence:Math.min(97,50+S.scope.length*4+S.risks.length*2)
+  };
+}
+
+// ── GENERATE REPORT ──
+function generateReport(){
+  if(!S.projectName){showToast('Add a project name first','yellow');showPanel('setup');return;}
+  if(!S.scope.length){showToast('Add deliverables first','yellow');showPanel('scope');return;}
+  const p=calcPricing();S.results={pricing:p};
+  renderReport(p);renderPlatforms();renderTimeline();
+  showPanel('report');showToast('Report generated!');
+}
+
+// ── REPORT ──
+const CAT_COLORS=['#4A8CB5','#C07D42','#5BAD76','#CFA034','#6AAFD8','#C55555','#9A8C7C','#6B5F50'];
+function renderReport(p){
+  document.getElementById('reportEmpty').style.display='none';
+  document.getElementById('reportContent').style.display='block';
+  document.getElementById('reportMeta').textContent=`${S.projectName} · ${S.projectType} · ${S.skillLevel} · ${S.region}`;
+
+  // Tiers
+  document.getElementById('tiersGrid').innerHTML=`
+    <div class="tier"><div class="tier-name">💼 Budget</div><div class="tier-amt">${fmtC(p.budgetTotal)}</div><div class="tier-rate">~${fmtC(p.rMin)}/hr</div><div class="tier-desc">Lean scope, price-sensitive clients.</div></div>
+    <div class="tier std"><div class="tier-badge">RECOMMENDED</div><div class="tier-name">⭐ Standard</div><div class="tier-amt">${fmtC(p.standardTotal)}</div><div class="tier-rate">~${fmtC(p.rTyp)}/hr</div><div class="tier-desc">Full risk buffer, revisions, professional delivery.</div></div>
+    <div class="tier prem"><div class="tier-badge">PREMIUM</div><div class="tier-name">💎 Premium</div><div class="tier-amt">${fmtC(p.premiumTotal)}</div><div class="tier-rate">~${fmtC(p.rMax)}/hr</div><div class="tier-desc">Expert-level, dedicated attention, unlimited revisions.</div></div>`;
+
+  // ── Pricing Breakdown (How we got here) ──
+  const urgPct=Math.round((p.urg-1)*100);
+  const riskPct=Math.round(p.risk*100);
+  document.getElementById('pricingBreakdown').innerHTML=`
+    <h4>📐 How the Standard price was calculated</h4>
+    <div class="pcb-row">
+      <span class="pcb-label">Base scope cost <small style="color:var(--muted)">(${p.deliverables.length} items × hours × rate)</small></span>
+      <span class="pcb-val">${fmtC(p.baseCostNoUrg)}</span>
+    </div>
+    ${urgPct>0?`<div class="pcb-row">
+      <span class="pcb-label">Urgency adjustment <small style="color:var(--muted)">(+${urgPct}% — ${S.urgency} deadline)</small></span>
+      <span class="pcb-val plus">+ ${fmtC(p.urgAmt)}</span>
+    </div>`:''}
+    ${riskPct>0?`<div class="pcb-row">
+      <span class="pcb-label">Risk buffer <small style="color:var(--muted)">(+${riskPct}% — ${S.risks.length} factor${S.risks.length!==1?'s':''})</small></span>
+      <span class="pcb-val plus">+ ${fmtC(p.riskAmt)}</span>
+    </div>`:''}
+    <div class="pcb-row">
+      <span class="pcb-label">Standard Total</span>
+      <span class="pcb-val total">${fmtC(p.standardTotal)}</span>
+    </div>
+    <div class="pcb-note">Budget = Standard × 0.75 &nbsp;|&nbsp; Premium = Standard × 1.25</div>`;
+
+  // Breakdown widgets
+  document.getElementById('bkGrid').innerHTML=`
+    <div class="bk-item"><div class="bk-label">Hourly Range</div><div class="bk-value">${fmtC(p.rMin)}–${fmtC(p.rMax)}/hr</div></div>
+    <div class="bk-item"><div class="bk-label">Typical Rate</div><div class="bk-value">${fmtC(p.rTyp)}/hr</div></div>
+    <div class="bk-item"><div class="bk-label">Total Hours</div><div class="bk-value">${fmt(p.totalHours)}h</div></div>
+    <div class="bk-item"><div class="bk-label">Risk Buffer</div><div class="bk-value">+${fmt(p.totalRiskPct*100)}%</div></div>
+    <div class="bk-item"><div class="bk-label">Urgency</div><div class="bk-value">+${fmt(urgPct)}%</div></div>
+    <div class="bk-item"><div class="bk-label">Confidence</div><div class="bk-value">${p.confidence}%</div></div>`;
+
+  // Charts
+  if(scopeChartInst)scopeChartInst.destroy();if(tiersChartInst)tiersChartInst.destroy();
+  scopeChartInst=new Chart(document.getElementById('scopeChart').getContext('2d'),{type:'doughnut',data:{labels:p.deliverables.map(d=>d.name),datasets:[{data:p.deliverables.map(d=>d.cost),backgroundColor:CAT_COLORS,borderColor:'#2B231A',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#9A8C7C',padding:8,font:{size:10}}}}}});
+  tiersChartInst=new Chart(document.getElementById('tiersChart').getContext('2d'),{type:'bar',data:{labels:['Budget','Standard','Premium'],datasets:[{data:[p.budgetTotal,p.standardTotal,p.premiumTotal],backgroundColor:['#6B5F50','#4A8CB5','#C07D42'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#9A8C7C',callback:v=>fmtC(v)},grid:{color:'#3E3228'}},y:{ticks:{color:'#EDE5D6'},grid:{color:'#3E3228'}}}}});
+
+  // Table
+  document.getElementById('reportTbody').innerHTML=p.deliverables.map(d=>{
+    const c=CATS[d.category]||{icon:'📦',label:d.category};
+    return`<tr><td>${d.name}</td><td>${c.icon} ${c.label}</td>
+      <td><span style="padding:.2rem .55rem;border-radius:6px;font-size:.72rem;font-weight:700;
+        background:${d.complexity==='simple'?'var(--green-dim)':d.complexity==='medium'?'var(--yellow-dim)':'var(--red-dim)'};
+        color:${d.complexity==='simple'?'var(--green)':d.complexity==='medium'?'var(--yellow)':'var(--red)'}">${d.complexity}</span></td>
+      <td>${fmt(d.hours)}h</td><td style="font-weight:700;color:var(--green)">${fmtC(d.cost)}</td></tr>`;
+  }).join('')+`<tr style="background:var(--card2);font-weight:700">
+    <td colspan="3">TOTAL</td><td>${fmt(p.totalHours)}h</td>
+    <td style="color:var(--rose)">${fmtC(p.deliverables.reduce((a,d)=>a+d.cost,0))}</td></tr>`;
+
+  // Gauge with platform dots
+  const gPct=Math.min(94,40+p.confidence*.55);
+  document.getElementById('gaugeNeedle').style.left=gPct+'%';
+  document.getElementById('gaugeInsight').textContent=gPct>70?'Your pricing is in the top tier — positioned as a premium professional.':gPct>50?'Well-aligned with market rates. Small increases are unlikely to lose clients.':'Conservative pricing — consider raising your rates.';
+
+  // Platform dots on gauge
+  const gaugeBar=document.getElementById('gaugeBar');
+  // Remove old dots
+  gaugeBar.querySelectorAll('.gauge-dot').forEach(d=>d.remove());
+  const dotsHTML=GAUGE_REFS.map(r=>`
+    <div class="gauge-dot" style="left:${r.pct}%;background:${r.color};" title="${r.label}">
+      <div class="gauge-dot-label" style="color:${r.color}">${r.label}</div>
+    </div>`).join('');
+  document.getElementById('gaugeDots').innerHTML=dotsHTML;
+  // Legend
+  document.getElementById('gaugeLegend').innerHTML=
+    GAUGE_REFS.map(r=>`<div style="display:flex;align-items:center;gap:.3rem"><div style="width:9px;height:9px;border-radius:50%;background:${r.color}"></div><span style="color:var(--muted2)">${r.label}</span></div>`).join('')+
+    `<div style="display:flex;align-items:center;gap:.3rem"><div style="width:3px;height:14px;background:#fff;border-radius:2px"></div><span style="color:var(--muted2)">Your position</span></div>`;
+
+  // Risk buffer list
+  document.getElementById('riskBufList').innerHTML=S.risks.length?S.risks.map(k=>{const r=RISK_DATA[k];return`<div style="display:grid;grid-template-columns:200px 1fr 60px;gap:.65rem;align-items:center;margin-bottom:.85rem;font-size:.83rem"><div style="color:var(--text)">${r.label}</div><div style="background:var(--border);border-radius:4px;height:7px;overflow:hidden"><div style="width:${r.pct*100/30*100}%;height:100%;background:var(--yellow);border-radius:4px"></div></div><div style="text-align:right;color:var(--yellow);font-weight:700">+${fmt(r.pct*100)}%</div></div>`;}).join(''):'<div style="color:var(--muted2);font-size:.84rem">No risk factors selected.</div>';
+
+  renderClauses(p);
+  updateStats();
+}
+
+function renderClauses(p){
+  const dep=S.clientType==='new'?50:30;
+  const rev=S.risks.includes('vague-req')||S.risks.includes('scope-creep')?2:3;
+  const cls=[
+    {tag:'essential',title:'Deposit & Payment',body:`A ${dep}% non-refundable deposit is required before work begins. Final payment is due upon delivery. Invoices are due within 7 days. Late payments incur 1.5%/month interest.`},
+    {tag:'essential',title:'Scope & Change Orders',body:`This agreement covers only the specified deliverables. Any additional requests require a written change order with agreed fees before work proceeds.`},
+    {tag:'essential',title:'Revision Policy',body:`${rev} rounds of revisions included. Additional rounds billed at ${fmtC(Math.round(p.rTyp))}/hr, minimum 2-hour charge.`},
+    {tag:S.risks.includes('ip-complex')?'essential':'recommended',title:'IP & Ownership Transfer',body:`Upon final payment, all deliverables are assigned to the Client, including source files and documentation.`},
+    {tag:'essential',title:'Client Responsibilities',body:`Client agrees to provide timely feedback, assets, and clear direction. Delays in client response extend timelines proportionally.`},
+    {tag:'essential',title:'Kill Fee & Termination',body:`If Client terminates, all work-to-date is billed within 48 hours. Kill fees: 25% if <25% complete; 50% if <50% complete.`},
+    {tag:'protection',title:'Portfolio Rights',body:`Freelancer may display completed work in their portfolio unless Client requests confidentiality within 7 days of completion.`}
+  ];
+  if(S.risks.includes('intl-payment'))cls.push({tag:'protection',title:'International Payments',body:"All currency conversion and wire fees are Client's responsibility. Payment must clear before deliverables are released."});
+  if(S.risks.includes('multi-stake'))cls.push({tag:'protection',title:'Single Point of Contact',body:'A designated project manager from the Client must be named. All feedback and approvals come through this single contact.'});
+  document.getElementById('clausesList').innerHTML=cls.map(c=>`<div class="clause-item"><div class="clause-hdr" onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.clause-chevron').classList.toggle('open')"><div><span class="clause-tag ${c.tag}">${c.tag}</span>${c.title}</div><span class="clause-chevron">▼</span></div><div class="clause-body"><p>${c.body}</p><button class="btn-ghost btn-sm" style="margin-top:.65rem" onclick="copyText('${c.body.replace(/'/g,"\\'")}')">📋 Copy</button></div></div>`).join('');
+}
+
+// ── TAX ──
+function calcTax(){
+  if(!S.results){showToast('Generate a report first','yellow');return;}
+  const country=document.getElementById('taxCountry').value;
+  const filing=document.getElementById('filingStatus').value;
+  const gross=S.results.pricing.standardTotal;
+  let se,income,expenses;
+  if(country==='usa'){
+    const si=gross*.9235;se=si*.153;
+    const ti=gross-se/2;
+    income=filing==='single'?(ti<=11000?ti*.10:ti<=44725?1100+(ti-11000)*.12:1100+(44725-11000)*.12+(ti-44725)*.22):(ti<=22000?ti*.10:ti<=89450?2200+(ti-22000)*.12:2200+(89450-22000)*.12+(ti-89450)*.22);
+    expenses=gross*.15;
+  } else if(country==='uk'){se=gross*.09;income=Math.max(0,gross-12570)*.20;expenses=gross*.15;}
+  else if(country==='canada'){se=gross*.10;income=gross*.205;expenses=gross*.15;}
+  else if(country==='australia'){se=gross*.10;income=gross*.26;expenses=gross*.15;}
+  else{se=gross*.15;income=gross*.25;expenses=gross*.15;}
+  const th=gross-se-income-expenses;
+  const effH=th/(S.results.pricing.totalHours||1);
+  document.getElementById('filingGrp').style.display=country==='usa'?'block':'none';
+  document.getElementById('taxResult').innerHTML=`
+    <div style="background:var(--card);border-radius:10px;padding:1.1rem;margin-top:.65rem">
+      ${[
+        ['Gross Revenue',fmtC(gross),'var(--text)'],
+        ['Self-Employment Tax','-'+fmtC(se),'var(--red)'],
+        ['Income Tax (est.)','-'+fmtC(income),'var(--red)'],
+        ['Business Expenses (est. 15%)','-'+fmtC(expenses),'var(--yellow)']
+      ].map(([l,v,c])=>`<div style="display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.83rem">
+        <span style="color:var(--muted2)">${l}</span>
+        <span style="font-weight:700;color:${c}">${v}</span>
+      </div>`).join('')}
+      <div style="text-align:center;margin-top:.65rem;padding:.75rem;background:var(--green-dim);border-radius:8px">
+        <div style="font-size:1.3rem;font-weight:800;color:var(--green)">${fmtC(th)}</div>
+        <div style="font-size:.75rem;color:var(--muted2);margin-top:.15rem">Net Take-Home · ${fmtC(effH)}/hr effective</div>
+      </div>
+      <div style="font-size:.75rem;color:var(--muted2);margin-top:.85rem;background:var(--card2);border-radius:8px;padding:.7rem;line-height:1.6">
+        <strong style="color:var(--lavender)">ℹ️ What is "Business Expenses (15%)"?</strong><br>
+        This is an estimate of deductible work-related costs you can write off: software subscriptions, equipment, home office, internet, professional tools, and other job-specific costs. 15% is a conservative estimate — your actual deductions may be higher. Always consult a tax professional.
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem;font-style:italic">Estimate only — consult a qualified tax professional for your jurisdiction.</div>
+    </div>`;
+}
+
+function calcChangeOrder(){
+  if(!S.results){showToast('Generate a report first','yellow');return;}
+  const hrs=parseInt(document.getElementById('changeHours').value)||10;
+  const std=S.results.pricing.rTyp,prem=S.results.pricing.rMax;
+  const msg=`Hi [Client], the additional scope falls outside our original agreement. At my standard rate of ${fmtC(std)}/hr, this would be ${fmtC(std*hrs)} for ${hrs} hours. At my premium rate for unplanned work, it would be ${fmtC(prem*hrs)}. A 50% deposit of ${fmtC(std*hrs*.5)} is required before I begin.`;
+  document.getElementById('changeOrderResult').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:.65rem 0">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem;text-align:center"><div style="font-size:.72rem;color:var(--muted2)">Standard Rate</div><div style="font-size:1.2rem;font-weight:700;color:var(--rose)">${fmtC(std*hrs)}</div></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem;text-align:center"><div style="font-size:.72rem;color:var(--muted2)">Premium Rate</div><div style="font-size:1.2rem;font-weight:700;color:var(--lavender)">${fmtC(prem*hrs)}</div></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.85rem;font-family:monospace;font-size:.78rem;color:var(--muted2);white-space:pre-wrap;line-height:1.7;margin-bottom:.65rem">${msg}</div>
+    <button class="btn-secondary btn-sm" onclick="copyText('${msg.replace(/'/g,"\\'")}')">📋 Copy</button>`;
+}
+
+// ── PLATFORMS ──
+function renderPlatforms(){
+  if(!S.results)return;
+  document.getElementById('platsEmpty').style.display='none';
+  document.getElementById('platsContent').style.display='block';
+  const p=S.results.pricing,directTH=p.rTyp*p.totalHours;
+  const grid=document.getElementById('platformsGrid');grid.innerHTML='';
+  [...Object.entries(PLAT_DATA),['direct',{emoji:'⚡',name:'Direct Client',tagline:'Zero fees — you keep everything',fee:0,pros:['Zero fees','Full rate control','Direct relationship'],cons:['Self-marketing required','Variable pipeline'],bestFor:'Established freelancers'}]].forEach(([key,d])=>{
+    const mult=d.mult?d.mult[S.skillLevel]:1;
+    const th=d.fee===0?directTH:p.rTyp*(mult||1)*p.totalHours*(1-d.fee);
+    const diff=directTH-th;
+    const card=document.createElement('div');
+    card.className='plat-card'+(key==='direct'?' rec':'');
+    card.innerHTML=`<div class="plat-hdr"><span class="plat-emoji">${d.emoji}</span><span class="plat-name">${d.name}</span></div>
+      <div class="plat-tagline">${d.tagline}</div>
+      <span class="plat-badge ${key==='direct'?'rec-b':'fee-b'}">${key==='direct'?'RECOMMENDED':'Fee: '+(d.fee*100).toFixed(0)+'%'}</span>
+      <div style="font-size:.72rem;color:var(--muted2);margin-bottom:.3rem">You take home</div>
+      <div class="plat-takehome">${fmtC(th)}</div>
+      <div class="plat-bar-bg"><div class="plat-bar-fill" style="width:${Math.min(100,th/directTH*100).toFixed(0)}%"></div></div>
+      <div>${d.pros.map(p=>`<div class="plat-pro">${p}</div>`).join('')}</div>
+      <div>${d.cons.map(c=>`<div class="plat-con">${c}</div>`).join('')}</div>
+      <div class="plat-bestfor">Best for: ${d.bestFor}</div>
+      ${diff>0?`<div style="font-size:.72rem;font-weight:700;color:var(--red);margin-top:.5rem">−${fmtC(diff)} vs Direct</div>`:''}`;
+    grid.appendChild(card);
+  });
+  const upDiff=directTH-p.rTyp*(PLAT_DATA.upwork.mult[S.skillLevel])*p.totalHours*(1-.20);
+  document.getElementById('platInsight').textContent=`Going direct keeps you ${fmtC(upDiff)} more than Upwork on this project alone.`;
+}
+
+// ── TIMELINE ──
+function renderTimeline(){
+  const ganttWrap=document.getElementById('ganttWrap');
+  if(!S.scope.length){ganttWrap.innerHTML='<div class="warn-box">Add deliverables in Scope Builder first.</div>';return;}
+  const hpw=Math.max(1,parseInt(document.getElementById('tlHpw')?.value)||40);
+  const buf=parseFloat(document.getElementById('tlBuffer')?.value)||.2;
+  const startVal=document.getElementById('tlStart')?.value;
+  const startDate=startVal?new Date(startVal):new Date();
+  let cur=0;
+  const tasks=S.scope.map((d,i)=>{const hrs=d.hours*(1+buf);const wks=Math.max(1,Math.ceil(hrs/hpw));const sw=cur;cur+=wks;return{...d,startWeek:sw,weeksNeeded:wks};});
+  const totalWks=cur;const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+totalWks*7);
+  const totalHrs=S.scope.reduce((a,d)=>a+d.hours,0);
+  document.getElementById('tlSummary').innerHTML=`
+    <div class="ts-item"><div class="ts-val">${fmt(totalHrs)}h</div><div class="ts-lbl">Total Hours</div></div>
+    <div class="ts-item"><div class="ts-val">${totalWks} wks</div><div class="ts-lbl">Duration</div></div>
+    <div class="ts-item"><div class="ts-val">${hpw}h/wk</div><div class="ts-lbl">Your Availability</div></div>
+    <div class="ts-item"><div class="ts-val">${endDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div><div class="ts-lbl">Est. End Date</div></div>`;
+  const wHdrs=Array.from({length:totalWks},(_,i)=>`<th class="gantt-week-hdr">W${i+1}</th>`).join('');
+  const rows=tasks.map((t,i)=>{
+    const cells=Array.from({length:totalWks},(_,w)=>{
+      if(w>=t.startWeek&&w<t.startWeek+t.weeksNeeded)return`<td style="padding:.3rem .25rem"><div class="gantt-bar${i%2?' alt':''}" style="border-radius:${w===t.startWeek?'4px':0} ${w===t.startWeek+t.weeksNeeded-1?'4px':0} ${w===t.startWeek+t.weeksNeeded-1?'4px':0} ${w===t.startWeek?'4px':0}"></div></td>`;
+      return`<td></td>`;
+    }).join('');
+    const c=CATS[t.category];
+    return`<tr><td class="g-name" style="border-left:3px solid ${c?.hex||'var(--rose)'}">${c?.icon||'📦'} ${t.name}<div style="font-size:.67rem;color:var(--muted2)">${t.hours}h · ${t.weeksNeeded}wk</div></td>${cells}</tr>`;
+  }).join('');
+  ganttWrap.innerHTML=`<div style="overflow-x:auto"><table class="gantt-table"><thead><tr><th style="min-width:150px">Deliverable</th>${wHdrs}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// ── BENCHMARKING ──
+function renderBench(){
+  const skill=document.getElementById('benchSkill')?.value||S.skillLevel;
+  const region=document.getElementById('benchRegion')?.value||S.region;
+  const yourRate=parseFloat(document.getElementById('benchRate')?.value)||BASE_RATES[skill].typical;
+  const reg=REG_MULT[region]||1,base=BASE_RATES[skill];
+  const bands=[
+    {label:'Top 10%',rate:Math.round(base.max*reg*1.2),color:'#C07D42'},
+    {label:'Top 25%',rate:Math.round(base.max*reg),color:'#4A8CB5'},
+    {label:'Median',rate:Math.round(base.typical*reg),color:'#5BAD76'},
+    {label:'Bottom 25%',rate:Math.round(base.min*reg*1.1),color:'#CFA034'},
+    {label:'Entry Level',rate:Math.round(base.min*reg),color:'#6B5F50'}
+  ];
+  const maxR=bands[0].rate;
+  document.getElementById('benchList').innerHTML=bands.map(b=>`<div class="mc-row">
+    <div class="mc-label">${b.label}</div>
+    <div class="mc-bar-bg"><div class="mc-bar-fill" style="width:${(b.rate/maxR*100).toFixed(0)}%;background:${b.color}"></div></div>
+    <div class="mc-val" style="color:${b.color}">$${b.rate}/hr</div>
+  </div>`).join('')+`<div class="mc-row you" style="margin-top:.5rem;border-top:1px solid var(--border);padding-top:.5rem">
+    <div class="mc-label" style="color:var(--rose);font-weight:700">▶ Your Rate</div>
+    <div class="mc-bar-bg"><div class="mc-bar-fill" style="width:${Math.min(100,yourRate/maxR*100).toFixed(0)}%;background:var(--rose)"></div></div>
+    <div class="mc-val">$${yourRate}/hr</div>
+  </div>`;
+  const above=bands.filter(b=>b.rate<=yourRate).length;
+  const pctile=['below market','bottom 25%','near median','top 25%','top 10%'][above]||'above top 10%';
+  document.getElementById('benchInsight').innerHTML=`<div class="info-box">Your rate of $${yourRate}/hr puts you in the <strong>${pctile}</strong> for ${skill} freelancers in ${region}.</div>`;
+  if(benchChartInst)benchChartInst.destroy();
+  benchChartInst=new Chart(document.getElementById('benchChart').getContext('2d'),{type:'bar',data:{labels:[...bands.map(b=>b.label),'Your Rate'],datasets:[{data:[...bands.map(b=>b.rate),yourRate],backgroundColor:[...bands.map(b=>b.color+'99'),'rgba(74,140,181,.9)'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#9A8C7C',font:{size:10}},grid:{color:'#3E3228'}},y:{ticks:{color:'#9A8C7C',callback:v=>'$'+v},grid:{color:'#3E3228'}}}}});
+  renderRaise();
+}
+function renderRaise(){
+  const pct=parseInt(document.getElementById('raiseSlider')?.value)||10;
+  const hpw=parseInt(document.getElementById('raiseHpw')?.value)||30;
+  const wpy=parseInt(document.getElementById('raiseWpy')?.value)||46;
+  const yourRate=parseFloat(document.getElementById('benchRate')?.value)||100;
+  document.getElementById('raisePctLbl').textContent='+'+pct+'%';
+  const cur=yourRate*hpw*wpy,raised=yourRate*(1+pct/100)*hpw*wpy;
+  document.getElementById('raiseResult').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.45rem">
+    <div><div style="font-size:.7rem;color:var(--muted2)">Current Annual</div><div style="font-size:1rem;font-weight:700;color:var(--muted2)">${fmtC(cur)}</div></div>
+    <div><div style="font-size:.7rem;color:var(--muted2)">After Raise</div><div style="font-size:1rem;font-weight:700;color:var(--green)">${fmtC(raised)}</div></div>
+  </div>
+  <div class="rr-val">+${fmtC(raised-cur)}/yr</div>
+  <div class="rr-lbl">extra at +${pct}% · ${hpw}h/wk · ${wpy} weeks</div>`;
+}
+
+// ── PROPOSAL ──
+function renderProposal(){
+  const yn=document.getElementById('pYourName')?.value||'[Your Name]';
+  const ye=document.getElementById('pYourEmail')?.value||'[Your Email]';
+  const yw=document.getElementById('pYourWeb')?.value||'';
+  const cl=document.getElementById('pClient')?.value||'[Client Name]';
+  const cc=document.getElementById('pContact')?.value||'';
+  const dep=document.getElementById('pDeposit')?.value||50;
+  const vd=document.getElementById('pValid')?.value||30;
+  const rev=document.getElementById('pRevisions')?.value||3;
+  const pt={on:'On Delivery',net7:'Net 7',net14:'Net 14',net30:'Net 30'}[document.getElementById('pPayTerms')?.value?.replace('-delivery','')]||'On Delivery';
+  const notes=document.getElementById('pNotes')?.value||'';
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const valid=new Date(Date.now()+parseInt(vd)*864e5).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const p=S.results?.pricing;
+  const lines=S.scope.length?S.scope.map(d=>`  • ${d.name} (${d.complexity}, ${d.hours}h) ................... ${p?fmtC(itemCost(d)):'TBD'}`).join('\n'):'  • [Add deliverables in Scope Builder]';
+  const text=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FREELANCE PROJECT PROPOSAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+From:    ${yn}
+         ${ye}${yw?'\n         '+yw:''}
+
+To:      ${cl}${cc?'\n         Attn: '+cc:''}
+
+Project: ${S.projectName||'[Project Name]'}
+Date:    ${today}
+Valid:   ${valid}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SCOPE OF WORK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${lines}
+${p?'\nTotal Estimated Hours: '+fmt(p.totalHours)+' hrs':''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INVESTMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Budget Option:          ${p?fmtC(p.budgetTotal):'TBD'}
+  Standard (Recommended): ${p?fmtC(p.standardTotal):'TBD'}
+  Premium:                ${p?fmtC(p.premiumTotal):'TBD'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TERMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Deposit:     ${dep}% non-refundable before work begins
+  Payment:     ${pt}
+  Revisions:   ${rev} rounds included
+  Timeline:    ${p?Math.ceil(p.totalHours/40)+' weeks (est.)':'See scope'}
+  Contract:    Required before project kickoff
+${notes?'\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nADDITIONAL NOTES\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'+notes+'\n':''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+To accept, reply in writing or sign the attached contract.
+
+${yn}
+${ye}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+  document.getElementById('proposalPreview').textContent=text;
+}
+function copyProp(){copyText(document.getElementById('proposalPreview')?.textContent||'');}
+
+// ── MISC ──
+function copyReport(){
+  if(!S.results)return;const p=S.results.pricing;
+  copyText(`FreelanceIQ — ${S.projectName}\nBudget: ${fmtC(p.budgetTotal)} | Standard: ${fmtC(p.standardTotal)} | Premium: ${fmtC(p.premiumTotal)}\nHours: ${fmt(p.totalHours)} | Rate: ${fmtC(p.rTyp)}/hr | Confidence: ${p.confidence}%`);
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
+  const d=new Date().toISOString().split('T')[0];
+  if(document.getElementById('tlStart'))document.getElementById('tlStart').value=d;
+});
+</script>
+</body>
+</html>
